@@ -10,6 +10,9 @@ There are two separate python files provided herein: xenocrates.py & xenocrates-
 
 *The GIAC GSE examination covers material discussed in multiple courses and therefore requires an additional piece of information for proper indexing: Course Designation*
 
+![alt tag](sample2.jpg)
+
+
 ##Indexing Methodology
 
 1. Create an excel spreadsheet with the following columns: title, description, page, book (add a course column for GSE indexing)
