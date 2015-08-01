@@ -16,7 +16,7 @@ The GIAC GSE examination covers material discussed in multiple courses and there
 
 2. Take notes from the course material. When I feel comfortable with the material I often annotate the location of certain information by filling in a title/page/book and providing a "." under description. This saves me study time while still allowing me to look up specifics related to a topic that I may have missed.
 
-2.1. (Optional) Excel has some nice sort functions built in. Xenocrates does proform alphabetical sorting, but depending on some of the characters you may have used while taking notes it may sort certain things counter intuitively. Notes including things like the following could potentially cause an error: '"<script>#$! (xenocrates-gse.py includes an extra layer of data processing that solves many of these problems)
+2.1 (Optional) Excel has some nice sort functions built in. Xenocrates does proform alphabetical sorting, but depending on some of the characters you may have used while taking notes it may sort certain things counter intuitively. Notes including thing content with odd characters may cause sorting errors, or may be rendered directly eg script tags. (xenocrates-gse.py includes an extra layer of data processing that solves many of these problems)
 
 3. Save the document as a tab delimited file
 
