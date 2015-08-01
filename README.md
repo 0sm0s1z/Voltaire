@@ -21,8 +21,9 @@ The GIAC GSE examination covers material discussed in multiple courses and there
 3. Save the document as a tab delimited file
 
 4. Run the program:
-
-python xenocrates.py <filename> > index.htm
+```
+	python xenocrates.py <filename> > index.htm
+```
 
 5. Xenocrates has created an HTML file with the formated content of your index. Open this file in a web browser. Press CTRL + A to select all content. Copy and paste the information into a word processor.
 
