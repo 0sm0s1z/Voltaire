@@ -8,7 +8,7 @@ Video: http://youtube.com/mtoussain
 
 There are two separate python files provided herein: xenocrates.py & xenocrates-gse.py
 
-The GIAC GSE examination covers material discussed in multiple courses and therefore requires an additional piece of information for proper indexing: Course Designation
+*The GIAC GSE examination covers material discussed in multiple courses and therefore requires an additional piece of information for proper indexing: Course Designation*
 
 ##Indexing Methodology
 
