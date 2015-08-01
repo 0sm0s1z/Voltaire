@@ -1,10 +1,15 @@
 Xenocrates is an indexing tool for GIAC certification examinations. Creating an index with Xenocrates is a three phase process involving: documentation/note-taking, sorting & normalization, and word processing. This readme is meant to guide a user through this process. Alternatively, a YouTube walkthrough will be released shortly.
 
+Video: http://youtube.com/mtoussain
+
+*Provided by @0sm0s1z*
+
+
 There are two separate python files provided herein: xenocrates.py & xenocrates-gse.py
 
 The GIAC GSE examination covers material discussed in multiple courses and therefore requires an additional piece of information for proper indexing: Course Designation
 
-- Indexing Methodology
+##Indexing Methodology
 
 1. Create an excel spreadsheet with the following columns: title, description, page, book (add a course column for GSE indexing)
 
@@ -35,5 +40,4 @@ python xenocrates.py <filename> > index.htm
 9. Get Certs
 
 10. Profit $$$
-
 
