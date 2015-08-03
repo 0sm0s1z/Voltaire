@@ -1,7 +1,7 @@
 #Xenocrates
 Xenocrates is an indexing tool for GIAC certification examinations. Creating an index with Xenocrates is a three phase process involving: documentation/note-taking, sorting & normalization, and word processing. This readme is meant to guide a user through this process. Alternatively, a YouTube walkthrough is avaliable at the link below.
 
-Video: https://youtu.be/U4QmSQDliHM
+Video: https://youtu.be/U4QmSQDIiHM
 
 *Provided by @0sm0s1z*
 
