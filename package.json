@@ -1,19 +1,56 @@
 {
-  "name": "fun-food-friends-no-auth",
-  "version": "0.1.0",
+  "name": "Voltaire",
+  "version": "1.0.0",
+  "description": "A minimal Electron application",
+  "author": "Matthew Toussain @0sm0s1z",
+  "license": "MIT",
+  "main": "src/electron-starter.js",
+  "homepage": "./",
   "private": true,
+  "repository": "https://github.com/",
+  "keywords": [
+    "Electron",
+    "quick",
+    "start",
+    "tutorial",
+    "demo"
+  ],
   "dependencies": {
+    "express": "^4.16.3",
+    "firebase": "^3.9.0",
     "react": "^15.5.4",
-    "react-dom": "^15.5.4"
+    "react-datasheet": "^1.3.8",
+    "react-dom": "^15.5.4",
+    "react-modal": "^3.5.1",
+    "react-router-dom": "^4.3.1",
+    "react-router-redux": "^4.0.8"
   },
   "devDependencies": {
-    "firebase": "^3.9.0",
+    "electron": "^2.0.4",
+    "electron-builder": "^13.6.0",
+    "foreman": "^3.0.1",
+    "react-redux": "^5.0.7",
+    "react-router": "^4.3.1",
     "react-scripts": "0.9.5"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "electron": "electron .",
+    "dev": "nf start -p 3000",
+    "pack": "build --dir",
+    "dist": "npm run build && build",
+    "postinstall": "install-app-deps"
+  },
+  "build": {
+    "appId": "com.electron.voltaire",
+    "win": {
+      "iconUrl": "https://acclaim-production-app.s3.amazonaws.com/images/6ce47e59-60ab-44fe-9590-15f88b3a2bd2/large_giac.png"
+    },
+    "directories": {
+      "buildResources": "public"
+    }
   }
 }
