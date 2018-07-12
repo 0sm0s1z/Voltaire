@@ -1,7 +1,7 @@
 # Voltaire
 Voltaire is a web-based indexing tool for GIAC certification examinations. Creating an index with Voltaire is a three phase process involving: documentation/note-taking, sorting & normalization, and word processing. This readme is meant to guide a user through this process. Alternatively, a YouTube walkthrough is avaliable at the link below.
 
-_Application URL:_ https://voltaire.publickey.io 
+**Application URL:** https://voltaire.publickey.io 
 
 *New Walkthrough Coming Soon* Video: https://youtu.be/U4QmSQDIiHM
 
