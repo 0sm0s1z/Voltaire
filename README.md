@@ -7,13 +7,13 @@ Voltaire is a web-based indexing tool for GIAC certification examinations. Creat
 
 Provided by @0sm0s1z
 
-![alt tag](sample1.jpg)
+![alt tag](sample1.png)
 
 ## Indexing Methodology
 
 Create a spreadsheet using the online indexing tool or using a document processor that can export to CSV format.
 
-![alt tag](sample2.jpg)
+![alt tag](sample2.png)
 
 Take notes from the course material. When I feel comfortable with the material I often annotate the location of certain information by filling in a title/page/book and providing a "." under description. This saves me study time while still allowing me to look up specifics related to a topic that I may have missed.
 
