@@ -3,7 +3,7 @@ Voltaire is a web-based indexing tool for GIAC certification examinations. Creat
 
 **Application URL:** https://voltaire.publickey.io 
 
-*New Walkthrough Coming Soon* Video: https://youtu.be/U4QmSQDIiHM
+*New Walkthrough Coming Soon* Video: https://youtu.be/bHpkTArlXWc
 
 Provided by @0sm0s1z
 
