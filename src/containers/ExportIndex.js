@@ -65,8 +65,9 @@ class ExportIndex extends Component {
         });
     }
     tmpList.sort(function(a, b){
-        if(a.title.value < b.title.value) return -1;
-        if(a.title.value > b.title.value) return 1;
+        var aTitle = a.title.value.toLowerCase(), bTitle = b.title.value.toLowerCase();
+        if(aTitle < bTitle) return -1;
+        if(aTitle > bTitle) return 1;
         return 0;
      });
 
