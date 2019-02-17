@@ -36,3 +36,19 @@ I typically use a clear front and black backing; however, having a clear cover o
 Get Certs
 
 Profit $$$
+
+## Common Issues
+
+What follows are troubleshooting proceedures for some of the common issues experienced while using Voltaire.
+
+### CSV Import Difficulties
+
+**Problem:** When attempting to import a CSV the import dialog does not go away and when refreshing the page none of my data is present.
+
+**Solution:** The CSV import feature, is a bit finicky. Your CSV will need to be formatted just right. In Excel it lets you put commas into your spreadsheet, but CSV uses them as delimiters you most likly have those (or some other odd characters) breaking your CSV. The easiest way to troubleshoot is to import sections (first 20 lines, then first 40, etc) of it until you find out what character is breaking it. Then find and replace that. Rinse and repeat. In the future I'll probably add a feature to let you know that your CSV formatting is off with troubleshooting instructions.
+
+### Exporting Problems
+
+**Problem:** When attempting to export the index it does not properly alphabetize my index.
+
+**Solution:** There is currently a bug in Voltaire that requires you have at least one result in your index for every letter. (Note, index titles must begin with a capitalized letter). Create references for each with a blank description and your issue should resolve.
