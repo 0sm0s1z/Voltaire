@@ -1,6 +1,16 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 import ReactDataSheet from 'react-datasheet';
 import Modal from 'react-modal';
+import clsx from 'clsx';
+
+import { withStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
+
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import SettingsIcon from '@material-ui/icons/Settings';
 
 import '../css/indextable.css';
 
@@ -8,7 +18,47 @@ import firebase, { auth } from '../firebase.js';
 
 Modal.setAppElement('#root');
 
-export default class Indexer extends Component {
+const styles = theme => ({
+  root: {
+    flexGrow: 1,
+  },
+  buttonNew: {
+    width: '100%',
+    borderRadius: '4px',
+    minWidth: '88px',
+    backgroundColor: '#FA6900',
+    cursor: 'pointer',
+    border: '0',
+    minWidth: '120px',
+    color: '#fff',
+    fontSize: '14px',
+    boxShadow: '0 2px 5px 0 rgba(0,0,0,.26)',
+    padding: '10px 6px',
+    '&:hover': {
+      backgroundColor: '#d75c04'
+    },
+  },
+  buttonConfig: {
+    width: '100%',
+    borderRadius: '4px',
+    backgroundColor: '#FA6900',
+    cursor: 'pointer',
+    border: '0',
+    minWidth: '50px',
+    color: '#fff',
+    fontSize: '14px',
+    boxShadow: '0 2px 5px 0 rgba(0,0,0,.26)',
+    padding: '10px 6px',
+    '&:hover': {
+      backgroundColor: '#d75c04'
+    },
+    numBox: {
+      width: '500px'
+    }
+  },
+});
+
+class Indexer extends Component {
   constructor (props) {
      super(props)
 
@@ -72,6 +122,12 @@ export default class Indexer extends Component {
       }
       indexRef.push(updateIndex);
    }
+   updateHistory(newRow) {
+     //New feature triggered by handleSubmit (currently doesn't affect direct grid modifications)
+     //This feature posts all index modifications to a parallel immutable history index that cannot be deleted
+    const indexRef = firebase.database().ref('/users/' + this.state.uid + '/history/' + this.props.indexTitle.indexId);
+    indexRef.push(newRow);
+   }
    handleChange(e) {
      this.setState({
       [e.target.name]: e.target.value
@@ -90,6 +146,7 @@ export default class Indexer extends Component {
          newPage: '',
          newBook: ''
       })
+      this.updateHistory(newRow);
       this.updateGrid(tmpGrid);
    }
    handleImport(e) {
@@ -118,6 +175,7 @@ export default class Indexer extends Component {
    }
 
   render() {
+    const { classes } = this.props;
     return (
       <div className="tablebg">
          <Modal
@@ -136,11 +194,13 @@ export default class Indexer extends Component {
             <div className="add-row">
                <form onSubmit={this.handleSubmit}>
                  <input className="add-row-title" type="text" name="newTitle" placeholder="Title" onChange={this.handleChange} value={this.state.newTitle} />
-                 <input type="text" name="newPage" placeholder="Page" onChange={this.handleChange} value={this.state.newPage} />
-                 <input type="text" name="newBook" placeholder="Book" onChange={this.handleChange} value={this.state.newBook} />
+                 <input className={classes.numBox} type="text" name="newPage" placeholder="Page" onChange={this.handleChange} value={this.state.newPage} />
+                 <input className={classes.numBox} type="text" name="newBook" placeholder="Book" onChange={this.handleChange} value={this.state.newBook} />
                  <input className="add-row-description" type="text" name="newDescription" placeholder="Description" onChange={this.handleChange} value={this.state.newDescription} />
-                 <button>Add Row</button>
-                 <button onClick={this.showImportDialog} type="button">Import CSV</button>
+                 <Button type="submit" className={classes.buttonNew} onClick={this.handleSubmit}>Add Row</Button>
+                 <Link to="/Settings">
+                  <Button className={classes.buttonConfig}><SettingsIcon /></Button>
+                 </Link>
                </form>
             </div>
          </div>
@@ -161,3 +221,4 @@ export default class Indexer extends Component {
     );
   }
 }
+export default withStyles(styles)(Indexer);

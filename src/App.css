@@ -37,6 +37,10 @@ body {
    width: 100%;
    color: white;
 }
+a {
+   text-decoration: none;
+   color: rgba(0, 0, 0, 0.87);
+}
 .navbg a {
    text-decoration: none;
    color: white;
@@ -46,8 +50,16 @@ body {
    color: #7a7c7c;
 }
 .navlogo {
-   position: absolute;
+   position: relative;
    font-size: 30px;
+   color: red;
+   font-family: Brush Script MT, Brush Script Std, cursive;
+   -webkit-app-region: no-drag;
+}
+.navlink {
+   position: relative;
+   font-size: 30px;
+   padding-left: 30px;
    color: red;
    font-family: Brush Script MT, Brush Script Std, cursive;
    -webkit-app-region: no-drag;
@@ -73,14 +85,13 @@ body {
   margin: 0 auto;
 }
 .add-row {
-  max-height: 100px;
   margin-left: 30px;
   margin-right: 30px;
   margin-bottom: 50px;
   border-radius: 2px;
   border-top: 3px solid #B11116;
   background-color: rgb(237, 237, 237);
-  padding: 60px 18px;
+  padding: 30px 18px;
   box-shadow: 0 3px 4px 0 rgba(0,0,0,.14), 0 3px 3px -2px rgba(0,0,0,.12), 0 1px 8px 0 rgba(0,0,0,.2);
 
 }
@@ -92,7 +103,7 @@ body {
   position: relative;
   float: left;
   margin-left: 15px;
-  width: 45px;
+  width: 80px;
   overflow: hidden;
 }
 .add-row-title {
@@ -108,21 +119,13 @@ body {
 
 /* */
 
-header {
+header-old {
   color: #fff;
   background-color: #103D5D;
   padding: 33px 0 25px 15px;
 }
 
-header h1 {
-  font-size: 25px;
-  font-weight: 600;
-  letter-spacing: 0.3px;
-  display: inline-block;
-  margin: 0;
-  vertical-align: middle;
 
-}
 
 .fa {
   font-size: 22px;
@@ -134,27 +137,24 @@ header i {
   margin-left: 12px;
 }
 
-.container {
+.tool-container {
   width: 100%;
   max-width: 1320px;
   margin: 0 auto;
   padding-top: 100px;
 }
-.wrapper {
-  max-width: 1100px;
-  margin: 0 auto;
-}
+
 .add-item {
   position: relative;
   min-height: 100px;
-  max-height: 100px;
+  max-height: 250px;
   margin-left: 30px;
   border-radius: 2px;
   border-top: 3px solid #B11116;
   background-color: rgb(237, 237, 237);
   padding: 18px 30px 90px 18px;
   box-shadow: 0 3px 4px 0 rgba(0,0,0,.14), 0 3px 3px -2px rgba(0,0,0,.12), 0 1px 8px 0 rgba(0,0,0,.2);
-  width: 264px;
+  width: 340px;
   visibility: visible;
 }
 
@@ -205,13 +205,13 @@ textarea {
   width: 500px;
 }
 
-ul {
+.wrapper ul {
   display: flex;
   flex-wrap: wrap;
   padding: 0;
 }
 
-li {
+.wrapper li {
   width: calc(100%);
   list-style-type: none;
   margin-top: -15px;
@@ -236,12 +236,12 @@ li p {
   padding: 15px;
 }
 
-form button {
+form button-old {
   width: 100%;
   margin-top: 10px;
 }
 
-button {
+button-old {
   border-radius: 4px;
   min-width: 88px;
   background-color: #FA6900;
@@ -253,7 +253,7 @@ button {
   box-shadow: 0 2px 5px 0 rgba(0,0,0,.26);
   padding: 10px 6px;
 }
-button:hover {
+button-old:hover {
    background-color: #d75c04;
 }
 h1 {
@@ -264,14 +264,17 @@ h1 {
 /* */
 .Modal {
   position: absolute;
-  top: 180px;
-  left: 40px;
-  right: 40px;
-  bottom: 40px;
-  width: 500px;
-  height: 300px;
+  top: 30%;
+  left: 30%;
+  right: 'auto';
+  bottom: 'auto';
+  width: 356px;
+  height: 232px;
   padding: 18px 55px 0px 10px;
-  background-color: white;
+  background-color: #f1f1f1;
+  border: 1px solid #888;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+  border-radius: 5px;
 }
 .Overlay {
   position: fixed;
@@ -316,65 +319,7 @@ h1 {
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
     -webkit-app-region: no-drag;
 }
-.dropdown-toggle::after {
-    display: inline-block;
-    width: 0;
-    height: 0;
-    margin-left: .255em;
-    vertical-align: .255em;
-    content: "";
-    border-top: .3em solid;
-    border-right: .3em solid transparent;
-    border-bottom: 0;
-    border-left: .3em solid transparent;
-}
-.dropdown, .dropup {
-    position: relative;
-    float: right;
-    display: block;
-}
-.dropdown-menu {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    z-index: 1000;
-    display: none;
-    float: left;
-    min-width: 10rem;
-    padding: .5rem 0;
-    margin: .125rem 0 0;
-    font-size: 1rem;
-    color: #212529;
-    text-align: left;
-    list-style: none;
-    background-color: #fff;
-    background-clip: padding-box;
-    border: 1px solid rgba(0,0,0,.15);
-    border-radius: .25rem;
-}
-.bd-example::after {
-    display: block;
-    clear: both;
-    content: "";
-}
-.dropdown-menu.show {
-    display: block;
-}
-.dropdown-item {
-    display: block;
-    width: 100%;
-    padding: .25rem 1.5rem;
-    clear: both;
-    font-weight: 400;
-    color: #212529;
-    text-align: inherit;
-    white-space: nowrap;
-    background-color: transparent;
-    border: 0;
-}
-.dropdown a {
-   color: #212529;
-}
+
 /*EXPORT*/
 .dexter {
    font-size: 13px;
