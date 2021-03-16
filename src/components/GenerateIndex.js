@@ -50,6 +50,7 @@ class GenerateIndex extends Component {
        data: [],
        dex: [],
        sym: [],
+       num: [],
        a: [],
        b: [],
        c: [],
@@ -97,14 +98,18 @@ class GenerateIndex extends Component {
       indexesRef.on('value', (snapshot) => {
       let items = snapshot.val();
       let newState = [];
+
       for (let item in items) {
-          newState.push({
-           grid: items[item].grid,
-          });
+
+        newState.push({
+         grid: items[item].grid,
+        });
+
       }
       this.setState({
           grid: newState[0].grid,
       });
+      console.log({grid:newState[0].grid})
     });
 
    }
@@ -171,55 +176,71 @@ class GenerateIndex extends Component {
     }
    }
    buildIndex() {
-
      //Compile Index
      const data = this.state.grid;
      let tmpList = [];
      let tmpList2 = [];
 
+     console.log(data, "data");
+
      //Build and Sort List
     for (let item in data) {
-      tmpList.push({
-         title: data[item][1],
-         description: data[item][2],
-         page: data[item][3],
-         book: data[item][4]
-      });
+      item = data[item]
+      if(!item[1].readOnly){
+        tmpList.push({
+           title: item[1].value,
+           description: item[2].value,
+           page: item[3].value,
+           book: item[4].value
+        });
+      }
     }
+
     tmpList.sort(function(a, b){
-        if(a.title.value.toLowerCase() < b.title.value.toLowerCase()) return -1;
-        if(a.title.value.toLowerCase() > b.title.value.toLowerCase()) return 1;
+        if(a.title.toLowerCase() < b.title.toLowerCase()) return -1;
+        if(a.title.toLowerCase() > b.title.toLowerCase()) return 1;
         return 0;
      });
 
-     //Segment by Alpha
-     var curLetter = ""
-     for (let item in tmpList) {
-       var letter = tmpList[item].title.value.charAt(0).toLowerCase()
-       if (letter == curLetter || letter.toUpperCase() == curLetter) {
-         tmpList2.push({
-            title: tmpList[item].title.value,
-            description: tmpList[item].description.value,
-            page: tmpList[item].page.value,
-            book: tmpList[item].book.value
-         });
+    var cache="";
+    var usedChars="";
 
-       } else {
-         //New letter
-         console.log(curLetter, tmpList2)
-         this.setState({
-             [curLetter.toLowerCase()]: tmpList2
-         });
-         curLetter = letter
-         tmpList2 = [];
-         tmpList2.push({
-            title: tmpList[item].title.value,
-            description: tmpList[item].description.value,
-            page: tmpList[item].page.value,
-            book: tmpList[item].book.value
-         });
-       }
+    for(let item in tmpList){
+        var item = tmpList[item]
+        var letter = item.title.charAt(0).toLowerCase();
+        //Current Letter
+        if(letter === cache){
+          tmpList2.push({...item})
+        }else{
+        //New Letter
+          this.setState({
+            [cache.toLowerCase()]: tmpList2
+          });
+
+          tmpList2 = Array(item)
+          cache=letter;
+          usedChars=usedChars+cache
+        }
+        /* Be sure to save the last value (Z?)... !important; */
+        this.setState({
+          [cache.toLowerCase()]: tmpList2
+        });
+
     }
+
+    //listOfChars
+
+    var nonalphabet = ""
+    var alphabet = "abcdefghijklmnopqrstuvwxyz";
+
+    for(let char in usedChars){
+      char = usedChars[char];
+      if(alphabet.indexOf(char) == -1){
+        nonalphabet = nonalphabet + char
+      }
+    }
+
+
 
      // Create document
      const doc = new docx.Document({
@@ -264,12 +285,75 @@ class GenerateIndex extends Component {
           }
       });
 
+      /*
+        Generates Heading for all Numbers used in Form.
+      */
+      const generateNumbers = () => {
+        var arr=[];
+        for(let char in nonalphabet){
+          char=nonalphabet[char];
+
+          if(!isNaN(parseInt(char))){
+            arr.push(this.createHeading("#"+char),
+              ...this.createIndexSection(this.state[char]),
+              new Paragraph({children: [new PageBreak()],})
+            )
+          }
+        }
+        return arr;
+      }
+      /*
+        Generates Heading for A->Z
+      */
+      const generateText = () => {
+        var arr = [];
+        for(let char in alphabet){
+          char=alphabet[char];
+
+          if(isNaN(parseInt(char))){
+            arr.push(this.createHeading(char.toUpperCase()+char.toLowerCase()),
+              ...this.createIndexSection(this.state[char]),
+              new Paragraph({children: [new PageBreak()],})
+            )
+          }
+        }
+        return arr;
+      }
+      /*
+        Generates Heading for all Symbols Provided in Form.
+      */
+      const generateSymbols = () => {
+        var arr=[];
+        for(let char in nonalphabet){
+          char=nonalphabet[char];
+
+          if(isNaN(parseInt(char))){
+            arr.push(this.createHeading(char),
+              ...this.createIndexSection(this.state[char]),
+              new Paragraph({children: [new PageBreak()],})
+            )
+          }
+        }
+        return arr;
+      }
+
      //Index Sections
      //var img = base64Img.base64Sync('../assets/images/indexes.png');
      const image2base64 = require('image-to-base64');
      fetch('https://api.github.com/users/0sm0s1z')
       .then(
           (response) => {
+
+            var numbers = generateNumbers();
+            var text = generateText();
+            var symbols = generateSymbols();
+
+
+
+
+              var children = [].concat(numbers,text,symbols);
+
+              console.log(this.state)
               console.log(response); //cGF0aC90by9maWxlLmpwZw==
               //Load State
               doc.addSection({
@@ -279,7 +363,7 @@ class GenerateIndex extends Component {
                           new Paragraph({
                               alignment: AlignmentType.CENTER,
                               children: [
-                                  new TextRun("Created using Voltaire an Open Security Tool"),
+                                  new TextRun("Created with Voltaire an Open Security Tool"),
                               ],
                           }),
                       ],
@@ -338,141 +422,8 @@ class GenerateIndex extends Component {
                       count: 2,
                   },
                },
-               children: [
-
-                  this.createHeading("Aa"),
-                  ...this.createIndexSection(this.state.a),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Bb"),
-                  ...this.createIndexSection(this.state.b),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Cc"),
-                  ...this.createIndexSection(this.state.c),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Dd"),
-                  ...this.createIndexSection(this.state.d),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Ee"),
-                  ...this.createIndexSection(this.state.e),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Ff"),
-                  ...this.createIndexSection(this.state.f),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Gg"),
-                  ...this.createIndexSection(this.state.g),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Hh"),
-                  ...this.createIndexSection(this.state.h),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Ii"),
-                  ...this.createIndexSection(this.state.i),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Jj"),
-                  ...this.createIndexSection(this.state.j),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Kk"),
-                  ...this.createIndexSection(this.state.k),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Ll"),
-                  ...this.createIndexSection(this.state.l),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Mm"),
-                  ...this.createIndexSection(this.state.m),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Nn"),
-                  ...this.createIndexSection(this.state.n),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Oo"),
-                  ...this.createIndexSection(this.state.o),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Pp"),
-                  ...this.createIndexSection(this.state.p),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Qq"),
-                  ...this.createIndexSection(this.state.q),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Rr"),
-                  ...this.createIndexSection(this.state.r),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Ss"),
-                  ...this.createIndexSection(this.state.s),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Tt"),
-                  ...this.createIndexSection(this.state.t),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Uu"),
-                  ...this.createIndexSection(this.state.u),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Vv"),
-                  ...this.createIndexSection(this.state.v),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Ww"),
-                  ...this.createIndexSection(this.state.w),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Xx"),
-                  ...this.createIndexSection(this.state.x),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Yy"),
-                  ...this.createIndexSection(this.state.y),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-                  this.createHeading("Zz"),
-                  ...this.createIndexSection(this.state.z),
-                  new Paragraph({
-                      children: [new PageBreak()],
-                  }),
-               ],
+               children: children,
              });
-
 
              Packer.toBlob(doc).then(blob => {
                 console.log(blob);
@@ -496,32 +447,35 @@ class GenerateIndex extends Component {
   render() {
     const { classes } = this.props;
     return (
+      <center>
       <Container>
-        <center>
-          <Typography onClick={this.showOptions} className={classes.heading} variant={'h4'} gutterBottom>
-            We hope you enjoy your new index! Good luck on the exam!
-          </Typography>
-          <Typography onClick={this.showOptions} className={classes.heading} variant={'h4'} gutterBottom>
-          </Typography>
-        </center>
+
         <Grid container
         direction="row"
         justify="center"
         spacing={3}
         >
-          <Grid item xs={4}>
-            <Card style={{marginTop: "30px", maxWidth: "100vw"}}>
+          <Grid item xs={7}>
+            <Card className="red-border" style={{marginTop: "30px", maxWidth: "100vw"}}>
               <Grid container direction="column">
                 <CardContent>
-                  <Button onClick={this.buildIndex} variant="contained" color="primary">
-                    Generate
+                <Typography onClick={this.showOptions} className={classes.heading} variant={'h4'} gutterBottom>
+                  Good luck on the exam!
+                </Typography>
+                <Typography onClick={this.showOptions} className={classes.heading} variant={'h6'} gutterBottom>
+                  Voltaire maintained by <u><a href="https://opensecurity.io">Open Security</a></u>
+                </Typography>
+
+                  <Button onClick={this.buildIndex} style={{marginTop: "16px"}} variant="contained" color="primary" className="voltaire-action">                    Download Index
                   </Button>
+
                 </CardContent>
               </Grid>
             </Card>
           </Grid>
         </Grid>
       </Container>
+      </center>
     );
   }
 }

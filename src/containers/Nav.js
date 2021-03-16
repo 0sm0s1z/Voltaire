@@ -260,7 +260,7 @@ class Nav extends Component {
          </div>
          <Divider />
          <List>
-          <Link to="/Indexes">
+          <Link to="/">
             <ListItem button>
              <ListItemIcon><AssignmentIcon /></ListItemIcon>
              <ListItemText primary="Indexes" />

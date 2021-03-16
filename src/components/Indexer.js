@@ -9,8 +9,17 @@ import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 
+import Card from '@material-ui/core/Card';
+import ToolBar from '@material-ui/core/Toolbar';
+import Container from '@material-ui/core/Container';
+import Grid from '@material-ui/core/Grid';
+import TextField from '@material-ui/core/TextField';
+
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import SettingsIcon from '@material-ui/icons/Settings';
+import NavigationIcon from '@material-ui/icons/Navigation';
+
+import Fab from '@material-ui/core/Fab';
 
 import '../css/indextable.css';
 
@@ -92,6 +101,8 @@ class Indexer extends Component {
      this.handleSubmit = this.handleSubmit.bind(this);
      this.showImportDialog = this.showImportDialog.bind(this);
      this.handleImport = this.handleImport.bind(this);
+     this.scrollToBottom = this.scrollToBottom.bind(this);
+     this.scrollToTop = this.scrollToTop.bind(this);
    }
    componentDidMount() {
       auth.onAuthStateChanged((user) => {
@@ -173,39 +184,61 @@ class Indexer extends Component {
       e.preventDefault();
       this.setState({ showModal: true });
    }
+   scrollToTop() {
+     this.top.scrollIntoView({behavior: "smooth"})
+   }
+   scrollToBottom() {
+     this.bottom.scrollIntoView({behavior: "smooth"})
+   }
 
   render() {
     const { classes } = this.props;
     return (
       <div className="tablebg">
-         <Modal
-           isOpen={this.state.showModal}
-           contentLabel="Paste Raw CSV Data"
-           className="Modal"
-           overlayClassName="Overlay"
-         >
-            <form onSubmit={this.handleImport}>
-               <textarea name="indexImport" onChange={this.handleChange} className="form-control" rows="10" placeholder="Paste Raw CSV Data Here"/>
-               <button>Import</button>
-            </form>
-         </Modal>
-         <div className="container-indexer">
-            <h1>{this.props.indexTitle.indexName}</h1>
-            <div className="add-row">
-               <form onSubmit={this.handleSubmit}>
-                 <input className="add-row-title" type="text" name="newTitle" placeholder="Title" onChange={this.handleChange} value={this.state.newTitle} />
-                 <input className={classes.numBox} type="text" name="newPage" placeholder="Page" onChange={this.handleChange} value={this.state.newPage} />
-                 <input className={classes.numBox} type="text" name="newBook" placeholder="Book" onChange={this.handleChange} value={this.state.newBook} />
-                 <input className="add-row-description" type="text" name="newDescription" placeholder="Description" onChange={this.handleChange} value={this.state.newDescription} />
-                 <Button type="submit" className={classes.buttonNew} onClick={this.handleSubmit}>Add Row</Button>
-                 <Link to="/Settings">
-                  <Button className={classes.buttonConfig}><SettingsIcon /></Button>
-                 </Link>
-               </form>
-            </div>
-         </div>
+      <p ref={(el) => {this.top = el;}}>&nbsp;</p>
+      <Fab className="scrollUp" onClick={this.scrollToTop}>
+        <NavigationIcon />
+      </Fab>
 
-         <ReactDataSheet
+      <Fab className="scrollDown" onClick={this.scrollToBottom}>
+        <NavigationIcon />
+      </Fab>
+        <Container>
+        <Card className="red-border" style={{marginTop:"95px",zIndex:"0"}}>
+          <ToolBar>
+            <Typography className={classes.heading} variant={'h6'} gutterBottom>
+              <h3>{this.props.indexTitle.indexName}</h3>
+            </Typography>
+          </ToolBar>
+          <form onSubmit={this.handleSubmit}>
+            <Container>
+            <Grid container direction="row" justify="space-around" alignItems="center" spacing={2}>
+              <Grid item xs={6} s={8} md={8} lg={10} xl={10}>
+                <TextField name="newTitle" onChange={this.handleChange} value={this.state.newTitle} variant="outlined" label="Row Title" style={{"width":"100%"}}/>
+              </Grid>
+              <Grid item xs={3} s={2} md={2} lg={1} xl={1}>
+                <TextField name="newPage" onChange={this.handleChange} value={this.state.newPage} variant="outlined" label="Page" style={{"width":"100%"}}/>
+              </Grid>
+              <Grid item xs={3} s={2} md={2} lg={1} xl={1}>
+                <TextField name="newBook" onChange={this.handleChange} value={this.state.newBook} variant="outlined" label="Book" style={{"width":"100%"}}/>
+              </Grid>
+              <br />
+              <Grid item xs={8} s={9} md={10} lg={10} xl={10}>
+                <TextField name="newDescription" onChange={this.handleChange} value={this.state.newDescription} variant="outlined" label="Description" style={{"width":"100%"}}/>
+              </Grid>
+              <Grid item xs={4} s={3} md={2} lg={2} xl={2}>
+                <Button onClick={this.handleSubmit} variant="contained" color="primary" style={{"width":"100%", "height":"1.1875em", "padding": "27px"}}>Add Row</Button>
+              </Grid>
+            </Grid>
+            </Container>
+          </form>
+          <br />
+        </Card>
+        </Container>
+        <center>
+        <Container>
+        <Card className="red-border" style={{marginTop:"35px",zIndex:"0", backgroundColor:"white"}}>
+         <ReactDataSheet style={{width:"100%",margin:"auto",padding:"0px"}}
             data={this.state.grid}
             valueRenderer={(cell) => cell.value}
             onCellsChanged={changes => {
@@ -217,7 +250,14 @@ class Indexer extends Component {
               this.updateGrid({grid})
             }}
           />
+        </Card>
+        </Container>
+        </center>
+        <p ref={(el) => {this.bottom = el;}}>&nbsp;</p>
       </div>
+
+
+
     );
   }
 }

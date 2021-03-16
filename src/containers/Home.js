@@ -6,13 +6,24 @@ import '../App.css';
 import firebase, { auth, provider } from '../firebase.js';
 
 import { withStyles } from '@material-ui/core/styles';
+import ToolBar from '@material-ui/core/Toolbar';
 import Button from '@material-ui/core/Button';
 import Input from '@material-ui/core/Input';
 import Typography from '@material-ui/core/Typography';
 import Container from '@material-ui/core/Container';
+import Paper from '@material-ui/core/Paper'
+import Card from '@material-ui/core/Card'
+import CardContent from '@material-ui/core/CardContent'
+import CardActions from '@material-ui/core/CardActions'
+import FormControl from '@material-ui/core/FormControl'
+import TextField from '@material-ui/core/TextField'
+import Box from '@material-ui/core/Box'
+
+import Grid from '@material-ui/core/Grid';
+import AppBar from '@material-ui/core/AppBar';
+
 
 import Modal from 'react-modal';
-
 import readXlsxFile from 'read-excel-file';
 import {OutTable, ExcelRenderer} from 'react-excel-renderer';
 
@@ -113,7 +124,10 @@ const styles = theme => ({
   },
   modText: {
     margin: "30px",
-  }
+  },
+  formControlWide:{
+    margin: theme.spacing(0),
+  },
 });
 
 
@@ -149,6 +163,7 @@ class App extends Component {
           user: null
         });
       });
+      location.reload();
   }
   login() {
     auth.signInWithRedirect(provider)
@@ -301,64 +316,121 @@ class App extends Component {
       deleteModal: !this.state.deleteModal
     });
   }
+
   render() {
     const { classes } = this.props;
     return (
-      <Container>
-        <Modal
-          isOpen={this.state.showModal}
-          contentLabel="Paste Raw CSV Data"
-          className="Modal"
-          overlayClassName="Overlay"
-        >
-          <input type="text" name="indexName" placeholder="Index Title" onChange={this.handleChange} value={this.state.indexName} />
+      <div>
 
-          <br />
 
-          <input type="file" name="file" id="file" onChange={this.fileHandler} className={classes.hideBtn} />
-          <label for="file" className={classes.upBtn}>Upload Spreadsheet</label>
 
-          <br /><br /><br />
+      <Modal
 
-          <Button className={classes.modBtn} onClick={this.importIndex}>Import</Button>
-          <Button className={classes.modBtn} onClick={this.toggleModal}>Cancel</Button>
-        </Modal>
-        <Modal
-          isOpen={this.state.deleteModal}
-          contentLabel="Paste Raw CSV Data"
-          className="Modal"
-          overlayClassName="Overlay"
-        >
-          <br />
-          <Typography className={classes.modText} align="center" variant="h6">
-            Are you sure you want to delete this index?
+        isOpen={this.state.showModal}
+        contentLabel="Paste Raw CSV Data"
+        className="Modal"
+        overlayClassName="Overlay"
+      >
+
+      <Card className={classes.root} style={{padding:"10px"}}>
+        <CardContent>
+          <Typography className={classes.title} color="textSecondary" gutterBottom>
+            Import an Index
           </Typography>
-          <Button className={classes.modBtn} onClick={this.toggleDelete}>Cancel</Button>
-          <Button className={classes.modBtn} onClick={this.removeItem}>Delete</Button>
-        </Modal>
-      <div className='app'>
-        <div className='tool-container'>
-          <section className='add-item'>
-          {this.state.user ?
-            <div>
-                <form onSubmit={this.handleSubmit}>
-                  <input type="text" name="indexName" placeholder="Index Title" onChange={this.handleChange} value={this.state.indexName} />
-                  <Button className={classes.buttonNew} onClick={this.handleSubmit}>Create New Index</Button>
-                </form>
-                <br />
 
-                   <div className='user-profile'>
-                     <img alt="" src={this.state.user.photoURL} />
-                   </div>
-                   <Button className={classes.buttonImport} onClick={this.toggleModal}>Import</Button>
-                   <Button className={classes.button} onClick={this.logout}>Log Out</Button>
-                  </div>
-                   :
-                     <Button variant="contained" className={classes.button} onClick={this.login}>Log In</Button>
-                 }
-          </section>
+            <Grid direction="column" justify="center" alignItems="center" spacing={1}>
+              <Grid item xs>
+                <TextField name="indexName" onChange={this.handleChange} value={this.state.indexName} variant="outlined" label="Index Name" style={{"width":"100%"}}/>
+              </Grid>
 
-            {this.state.items.map((item) => {
+              <Grid item xs>
+                  <input type="file" name="file" id="file" onChange={this.fileHandler} className={classes.hideBtn} />
+                  <Button style={{width:"100%"}} variant="outlined" color="secondary"><label for="file">Upload Spreadsheet</label></Button>
+              </Grid>
+              </Grid>
+
+        </CardContent>
+        <br />
+        <CardActions>
+            <Button size="large" variant="contained" color="secondary" onClick={this.importIndex}>Import</Button>
+            <Button size="large" variant="outlined" color="cancel" onClick={this.toggleModal}>Cancel</Button>
+        </CardActions>
+      </Card>
+
+
+  </Modal>
+  {this.state.user ?
+    <section>
+    <div className='user-profile'>
+      <img alt='' src={this.state.user.photoURL} />
+    </div>
+    </section>
+    : ""
+  }
+
+
+      <Modal
+        isOpen={this.state.deleteModal}
+        contentLabel="Paste Raw CSV Data"
+        className="Modal"
+        overlayClassName="Overlay"
+      >
+
+        <Card className={classes.root}>
+          <CardContent>
+            <Typography className={classes.title} color="textSecondary" gutterBottom>
+              Index Deletion
+            </Typography>
+            <Typography className={classes.modText} align="center" variant="h6">
+              Are you sure you want to delete this index?
+            </Typography>
+
+          </CardContent>
+          <CardActions style={{margin:"right"}}>
+              <Button  onClick={this.removeItem} size="large" variant="contained" color="primary">Delete</Button>
+              <Button  onClick={this.toggleDelete} size="large" variant="outlined" color="cancel">Cancel</Button>
+          </CardActions>
+        </Card>
+
+
+
+
+      </Modal>
+      <Container>
+
+        <Card className="red-border" style={{marginTop:"95px",zIndex:"0"}}>
+          <ToolBar>
+            <Typography className={classes.heading} variant={'h6'} gutterBottom>
+              <h3>Home</h3>
+            </Typography>
+            <Grid container direction="row" justify="flex-end" alignItems="center">
+              <Grid item s={6}><Button color="inherit" style={{width:"100%", float:"right"}} onClick={this.toggleModal}> Import Index </Button></Grid>
+              <Grid item s={6}><Button color="inherit" style={{width:"100%", float:"right"}} onClick={this.logout}> Logout </Button></Grid>
+            </Grid>
+          </ToolBar>
+          <form>
+            <Container>
+            <Grid container direction="row" justify="space-around" alignItems="center" spacing={2}>
+              <Grid item xs={6} s={9} md={10} lg={10} xl={10}>
+                <TextField name="indexName" onChange={this.handleChange} value={this.state.indexName}  variant="outlined" label="Index Name" style={{"width":"100%"}}/>
+              </Grid>
+              <Grid item xs={6} s={3} md={2} lg={2} xl={2}>
+                <Button onClick={this.handleSubmit} style={{"width":"100%", "height":"1.1875em", "padding": "27px"}} color="secondary" variant="contained">Create New Index</Button>
+              </Grid>
+            </Grid>
+            </Container>
+          </form>
+          <br />
+        </Card>
+      </Container>
+
+
+      <Container>
+
+      <div className='app' style={{marginTop:"35px"}}>
+      <Card className="red-border">
+      <Grid container direction="row" justify="space-evenly" alignItems="center" spacing={1}>
+          {this.state.items.map((item) => {
               return (
                  <section key={item.id} className='display-item'>
                   <div className="wrapper">
@@ -367,30 +439,42 @@ class App extends Component {
                         <Typography className={classes.heading} variant={'h6'} gutterBottom>
                           <h3>{item.title}</h3>
                         </Typography>
-                        <br />
+                        <div className="wrapper-body">
                         <center>
-                           <img alt="img" src="https://acclaim-production-app.s3.amazonaws.com/images/6ce47e59-60ab-44fe-9590-15f88b3a2bd2/large_giac.png" />
+                           <img alt="img" src="https://sans.org/images/giac_logo_big.gif" width="100px" height="100px"/>
                         </center>
-                        <p>
+                        <CardActions>
+                        <Grid container direction="row" justify="space-evenly" alignItems="center" spacing={0}>
+                        <Grid item xs={5}>
                           <Link to={{
                              pathname: "/IndexTool",
                              state: {
                                 indexId: item.id,
                                 indexName: item.title
                              }
-                          }}><Button className={classes.button}>Edit</Button></Link>
-                          <Button className={classes.button} onClick={() => this.deletePending(item.id)}>Delete</Button>
-                        </p>
+                          }}>
+
+                          <Button size="large" style={{width:"100%"}} variant="contained" color="secondary">Edit</Button>
+
+                          </Link>
+                          </Grid>
+                          <Grid item xs={5}>
+                            <Button size="large" style={{width:"100%"}}  variant="contained" color="secondary" onClick={() => this.deletePending(item.id)}>Delete</Button>
+                          </Grid>
+                        </Grid>
+                        </CardActions>
+                        </div>
                      </li>
                      </ul>
                   </div>
                </section>
               )
             })}
-
+            </Grid>
+          </Card>
         </div>
-      </div>
       </Container>
+      </div>
     );
   }
 }
