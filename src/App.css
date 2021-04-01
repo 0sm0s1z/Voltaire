@@ -3,10 +3,6 @@ body {
   background-color: #fff;
 }
 
-.tablebg {
-   margin-top: 75px;
-   color: black;
-}
 .exportbtn {
    float: right;
 }
@@ -95,10 +91,7 @@ a {
   box-shadow: 0 3px 4px 0 rgba(0,0,0,.14), 0 3px 3px -2px rgba(0,0,0,.12), 0 1px 8px 0 rgba(0,0,0,.2);
 
 }
-.add-row form {
-  width: 100%;
-  overflow: hidden;
-}
+
 .add-row input {
   position: relative;
   float: left;
@@ -157,31 +150,30 @@ header i {
   width: 340px;
   visibility: visible;
 }
-
 .display-item {
-  position: relative;
-  float: left;
-  margin-left: 30px;
-  margin-top: 30px;
-  padding-bottom: 30px;
-  width: 300px;
-  background-color: rgb(237, 237, 237);
+  padding:0px;
+  margin-top:10px;
+  min-width: 350px;
+  background-color:#fff;
   color: #000;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
   box-shadow: 0 3px 4px 0 rgba(0,0,0,.14), 0 3px 3px -2px rgba(0,0,0,.12), 0 1px 8px 0 rgba(0,0,0,.2);
 }
-
+.wrapper{
+  padding:0px;
+}
+.wrapper-body{
+  padding:15px;
+}
 .display-item button {
-  float: left;
-  margin-top: 20px;
-  margin-left: 10px;
   display: block;
+  position:relative;
+  bottom:0;
 }
 
-.add-item form {
-  width: 100%;
-  overflow: hidden;
-  z-index: 199;
+.display-item img{
+  width:100%;
+  height:auto;
 }
 
 input {
@@ -208,54 +200,32 @@ textarea {
 .wrapper ul {
   display: flex;
   flex-wrap: wrap;
-  padding: 0;
+  padding:0px;
+  margin:0px;
 }
 
 .wrapper li {
-  width: calc(100%);
+  width: 100%;
   list-style-type: none;
-  margin-top: -15px;
-  box-shadow: 0px -1px 0px 0 rgba(0,0,0,.14), 1px -2px 3px -2px rgba(0,0,0,.12), 0px -2px 4px 0 rgba(0,0,0,.2);
 }
 
 h2 {
-  padding: 0;
-  margin: 0;
+  padding: 0px;
+  margin: 0px;
   font-weight: 400;
 }
 
 li h3 {
   background-color: #B11116;
-  margin: 0;
+  margin: 0px;
   color: #fff;
   font-weight: 300;
   padding: 15px;
 }
 
-li p {
-  padding: 15px;
-}
 
-form button-old {
-  width: 100%;
-  margin-top: 10px;
-}
 
-button-old {
-  border-radius: 4px;
-  min-width: 88px;
-  background-color: #FA6900;
-  cursor: pointer;
-  border: 0;
-  min-width: 120px;
-  color: #fff;
-  font-size: 14px;
-  box-shadow: 0 2px 5px 0 rgba(0,0,0,.26);
-  padding: 10px 6px;
-}
-button-old:hover {
-   background-color: #d75c04;
-}
+
 h1 {
    font-family: Arial, Helvetica, Helvetica Neue, serif;
    margin-left: 30px;
@@ -263,18 +233,10 @@ h1 {
 
 /* */
 .Modal {
-  position: absolute;
-  top: 30%;
-  left: 30%;
-  right: 'auto';
-  bottom: 'auto';
-  width: 356px;
-  height: 232px;
-  padding: 18px 55px 0px 10px;
-  background-color: #f1f1f1;
-  border: 1px solid #888;
-  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
-  border-radius: 5px;
+  margin:auto;
+  margin-top:50vh;
+  transform:translateY(-50%);
+  max-width: 500px;
 }
 .Overlay {
   position: fixed;
@@ -285,7 +247,7 @@ h1 {
   background-color: rgba(0,0,0,0.4);
 }
 .Modal button {
-  max-width: 100px;
+
   float: right;
 }
 .user-profile {
@@ -345,4 +307,41 @@ h1 {
 }
 .content {
 
+}
+
+.red-border{
+  border-top:3px solid #B11116 !important;
+  background-color:#dcdcdc;
+}
+
+input{
+  background-color:white!important;
+  border-radius:5px;
+}
+
+.scrollDown:hover{
+  opacity:1.0;
+}
+.scrollDown{
+  opacity:0.25;
+  z-index: 1000;
+  transform:rotate(180deg);
+  position:fixed!important;
+  bottom:10px;
+  right:10px;
+}
+
+.scrollUp{
+  z-index: 1000;
+  position:fixed!important;
+  top:75px;
+  right:10px;
+  opacity:0.25;
+}
+.scrollUp:hover{
+  opacity:1.0;
+}
+
+.voltaire-action{
+  background-color: #FA6900;
 }

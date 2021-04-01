@@ -21,20 +21,29 @@ import { ThemeProvider } from '@material-ui/core/styles';
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: '#556cd6',
+      main: '#B11116',
+
     },
     secondary: {
-      main: '#19857b',
+      main: '#FA6900',
+      contrastText: '#FFF'
+    },
+    confirm:{
+      main: '#FF8D00',
+    },
+    cancel:{
+      main: '#eeeeee',
     },
     error: {
       main: red.A400,
     },
     background: {
-      default: '#fff',
+      default: '#FAFAFA',
     },
   },
-});
 
+});
+console.log(theme)
 export default class App extends Component {
   render() {
     return (
