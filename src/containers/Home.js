@@ -22,6 +22,7 @@ import Box from '@material-ui/core/Box'
 import Grid from '@material-ui/core/Grid';
 import AppBar from '@material-ui/core/AppBar';
 
+import GIACLogo from "../assets/images/giaclogo.jpeg";
 
 import Modal from 'react-modal';
 import readXlsxFile from 'read-excel-file';
@@ -441,7 +442,7 @@ class App extends Component {
                         </Typography>
                         <div className="wrapper-body">
                         <center>
-                           <img alt="img" src="https://sans.org/images/giac_logo_big.gif" width="100px" height="100px"/>
+                           <img width="100px" height="100px" src={GIACLogo} />
                         </center>
                         <CardActions>
                         <Grid container direction="row" justify="space-evenly" alignItems="center" spacing={0}>
