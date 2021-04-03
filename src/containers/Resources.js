@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import firebase, { auth } from '../firebase.js';
+
+import Nav from './Nav';
 import Resources from '../components/Resources';
 
 class Main extends Component {
@@ -15,6 +17,7 @@ class Main extends Component {
   render() {
     return (
       <div className='app'>
+          <Nav />
           <Resources />
       </div>
     );

@@ -56,6 +56,7 @@ class BuildWizard extends Component {
        checkdoublesided: true,
        checkcoversheet: true,
        indexList: [],
+       indexExportData: [],
        columns: [
         { label: 'Title', width: '30%' },
         { label: 'Description', width: '20%' },
@@ -114,18 +115,51 @@ class BuildWizard extends Component {
      }
 
    }
+   exportIndex(id) {
+      const indexesRef = firebase.database().ref('/users/' + this.state.uid + '/indexdata/' + id);
+      indexesRef.on('value', (snapshot) => {
+        let items = snapshot.val();
+        let newState = [];
+        for (let item in items) {
+          newState.push({
+           grid: items[item].grid
+          });
+        }
+        console.log(newState)
+        this.setState({
+          grid: newState[0].grid
+        });
+     });
+     this.buildIndex();
+   }
+   buildIndex() {
+      const data = this.state.grid;
+      let tmpList = [];
+
+      //Build and Sort List
+      for (let item in data) {
+         tmpList.push({
+            title: data[item][1],
+            description: data[item][2],
+            page: data[item][3],
+            book: data[item][4]
+         })
+     }
+     tmpList.sort(function(a, b){
+         if(a.title.value < b.title.value) return -1;
+         if(a.title.value > b.title.value) return 1;
+         return 0;
+      });
+      this.setState({
+       indexExportData: tmpList
+      });
+      console.log(tmpList);
+   }
 
    render() {
      const { classes } = this.props;
      return (
-
-
-
-
-
-
-
-           <Container>
+        <Container>
            <Grid container
            direction="row"
            justify="center"
@@ -260,20 +294,11 @@ class BuildWizard extends Component {
              </Grid>
              : null }
 
-</Grid>
-</Card>
-</Grid>
-</Grid>
-</Container>
-
-
-
-
-
-
-
-
-
+    </Grid>
+    </Card>
+    </Grid>
+    </Grid>
+    </Container>
      );
    }
  }

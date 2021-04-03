@@ -152,12 +152,10 @@ header i {
 }
 .display-item {
   padding:0px;
-  margin-top:10px;
   min-width: 350px;
   background-color:#fff;
   color: #000;
-  margin-bottom: 10px;
-  box-shadow: 0 3px 4px 0 rgba(0,0,0,.14), 0 3px 3px -2px rgba(0,0,0,.12), 0 1px 8px 0 rgba(0,0,0,.2);
+  margin-bottom: 0px;
 }
 .wrapper{
   padding:0px;
@@ -174,6 +172,9 @@ header i {
 .display-item img{
   width:100%;
   height:auto;
+}
+.item-barrier {
+  margin-bottom: 15px;
 }
 
 input {
@@ -312,6 +313,7 @@ h1 {
 .red-border{
   border-top:3px solid #B11116 !important;
   background-color:#dcdcdc;
+  margin-bottom: -5px;
 }
 
 input{

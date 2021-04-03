@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, BrowserRouter } from 'react-router-dom';
 
-import Nav from './Nav';
 import Home from './Home';
 import IndexTool from './IndexTool';
 import ExportIndex from './ExportIndex';
@@ -51,17 +50,19 @@ export default class App extends Component {
         <ThemeProvider theme={theme}>
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
-          <Nav />
-          <Switch>
-            <Route exact path="/Indexes" component={Home}/>
-            <Route exact path="/Resources" component={Resources}/>
-            <Route exact path="/Settings" component={Settings}/>
-            <Route exact path="/BuildIndex" component={BuildIndex}/>
-            <Route exact path="/IndexTool" component={IndexTool}/>
-            <Route exact path="/DownloadIndex" component={DownloadIndex}/>
-            <Route exact path="/ExportIndex" component={ExportIndex}/>
-            <Route exact path="/" component={Main}/>
-          </Switch>
+          <BrowserRouter>
+
+            <Switch>
+              <Route exact path="/Indexes" component={Home}/>
+              <Route exact path="/Resources" component={Resources}/>
+              <Route exact path="/Settings" component={Settings}/>
+              <Route exact path="/BuildIndex" component={BuildIndex}/>
+              <Route exact path="/IndexTool" component={IndexTool}/>
+              <Route exact path="/DownloadIndex" component={DownloadIndex}/>
+              <Route exact path="/ExportIndex" component={ExportIndex}/>
+              <Route exact path="/" component={Main}/>
+            </Switch>
+          </BrowserRouter>
         </ThemeProvider>
       </div>
     );

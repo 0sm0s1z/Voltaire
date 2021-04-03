@@ -118,9 +118,12 @@ class Indexer extends Component {
                 grid: items[item].grid
               });
             }
-            this.setState({
-              grid: newState[0].grid
-            });
+            if(newState[0])
+            {
+              this.setState({
+                grid: newState[0].grid
+              });
+            }
           });
        }
      });

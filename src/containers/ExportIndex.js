@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import firebase, { auth } from '../firebase.js';
 
+import Nav from './Nav';
+
 class ExportIndex extends Component {
   constructor() {
     super();
@@ -124,6 +126,7 @@ class ExportIndex extends Component {
   render() {
     return (
       <div className='app'>
+        <Nav />
         <div className='container'>
           <div className="indexbox">
             <button onClick={this.exportIndex}>Build Index</button>

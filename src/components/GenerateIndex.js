@@ -57,7 +57,7 @@ class GenerateIndex extends Component {
        d: [],
        e: [],
        f: [],
-       d: [],
+       g: [],
        h: [],
        i: [],
        j: [],
@@ -205,8 +205,8 @@ class GenerateIndex extends Component {
     var cache="";
     var usedChars="";
 
-    for(let item in tmpList){
-        var item = tmpList[item]
+    for(let itema in tmpList){
+        var item = tmpList[itema]
         var letter = item.title.charAt(0).toLowerCase();
         //Current Letter
         if(letter === cache){

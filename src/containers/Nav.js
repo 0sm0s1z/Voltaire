@@ -118,7 +118,8 @@ class Nav extends Component {
        indexExportData: [],
        grid: [],
        open: false,
-       anchorEl: React.useState<null | HTMLElement>(null),
+       anchorEl: null,
+       //anchorEl: React.useState<null | HTMLElement>(null),
      }
      this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
      this.handleDrawerClose = this.handleDrawerClose.bind(this);
@@ -260,30 +261,30 @@ class Nav extends Component {
          </div>
          <Divider />
          <List>
-          <Link to="/">
+       <Link to="/">
             <ListItem button>
              <ListItemIcon><AssignmentIcon /></ListItemIcon>
              <ListItemText primary="Indexes" />
             </ListItem>
           </Link>
-          <Link to="/Resources">
+        <Link to="/Resources">
            <ListItem button>
             <ListItemIcon><MenuBookIcon /></ListItemIcon>
             <ListItemText primary="Resources" />
            </ListItem>
-          </Link>
-          <Link to="/Resources">
+         </Link>
+       <Link to="/Resources">
            <ListItem button>
             <ListItemIcon><LiveHelpIcon /></ListItemIcon>
             <ListItemText primary="FAQ" />
            </ListItem>
-          </Link>
-          <Link to="/Settings">
+         </Link>
+       <Link to="/Settings">
            <ListItem button>
             <ListItemIcon><SettingsIcon /></ListItemIcon>
             <ListItemText primary="Settings" />
            </ListItem>
-          </Link>
+         </Link>
          </List>
          <Divider />
          <ListItem button>

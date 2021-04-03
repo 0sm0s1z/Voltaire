@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import firebase, { auth } from '../firebase.js';
 
+import Nav from './Nav';
 import GenerateIndex from '../components/GenerateIndex';
 
 import clsx from 'clsx';
@@ -62,9 +63,12 @@ class BuildIndex extends Component {
   render() {
     const { classes } = this.props;
     return (
-      <Container className={classes.main}>
-        <GenerateIndex buildData={this.props.location.state}/>
-      </Container>
+      <div>
+        <Nav />
+        <Container className={classes.main}>
+          <GenerateIndex buildData={this.props.location.state}/>
+        </Container>
+      </div>
     );
   }
 }

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 
+import Nav from './Nav';
+
 //import logo from '../logo.svg';
 import '../App.css';
 import firebase, { auth, provider } from '../firebase.js';
@@ -164,7 +166,7 @@ class App extends Component {
           user: null
         });
       });
-      location.reload();
+      window.location.reload();
   }
   login() {
     auth.signInWithRedirect(provider)
@@ -322,6 +324,7 @@ class App extends Component {
     const { classes } = this.props;
     return (
       <div>
+      <Nav />
 
 
 
@@ -425,14 +428,14 @@ class App extends Component {
         </Card>
       </Container>
 
-
+      {/* Index Cards */}
       <Container>
-
-      <div className='app' style={{marginTop:"35px"}}>
-      <Card className="red-border">
-      <Grid container direction="row" justify="space-evenly" alignItems="center" spacing={1}>
+        <div className='app' style={{marginTop:"35px"}}>
+        <Grid container direction="row" justify="space-evenly" alignItems="center" spacing={1}>
           {this.state.items.map((item) => {
               return (
+                <div className="item-barrier">
+                <Card className="red-border">
                  <section key={item.id} className='display-item'>
                   <div className="wrapper">
                      <ul>
@@ -469,10 +472,11 @@ class App extends Component {
                      </ul>
                   </div>
                </section>
+               </Card>
+               </div>
               )
             })}
             </Grid>
-          </Card>
         </div>
       </Container>
       </div>

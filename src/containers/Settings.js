@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import firebase, { auth } from '../firebase.js';
 
+import Nav from './Nav';
 import SettingsToolbar from '../components/SettingsToolbar';
 import SettingsIndexes from '../components/SettingsIndexes';
 
@@ -63,10 +64,13 @@ class Settings extends Component {
   render() {
     const { classes } = this.props;
     return (
-      <Container className={classes.main}>
-        <SettingsToolbar />
-        <SettingsIndexes />
-      </Container>
+      <div>
+        <Nav />
+        <Container className={classes.main}>
+          <SettingsToolbar />
+          <SettingsIndexes />
+        </Container>
+      </div>
     );
   }
 }
