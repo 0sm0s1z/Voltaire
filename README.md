@@ -1,70 +1,54 @@
-# Getting Started with Create React App
+# Voltaire
+Voltaire is a web-based indexing tool for GIAC certification examinations. Creating an index with Voltaire is a three phase process involving: documentation/note-taking, sorting & normalization, and word processing. This readme is meant to guide a user through this process. Alternatively, a YouTube walkthrough is avaliable at the link below.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**Application URL:** https://voltaire.publickey.io 
 
-## Available Scripts
+Video: https://youtu.be/bHpkTArlXWc
 
-In the project directory, you can run:
+Provided by @0sm0s1z
 
-### `yarn start`
+![alt tag](sample1.png)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Indexing Methodology
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Create a spreadsheet using the online indexing tool or using a document processor that can export to CSV format.
 
-### `yarn test`
+![alt tag](sample2.png)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Take notes from the course material. When I feel comfortable with the material I often annotate the location of certain information by filling in a title/page/book and providing a "." under description. This saves me study time while still allowing me to look up specifics related to a topic that I may have missed.
 
-### `yarn build`
+When you click the export button in the upper righthand corner, Voltaire creates an HTML file with the formated content of your index. Press CTRL + A to select all content. Copy and paste the information into a word processor.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Format the document according to your preferences, here are some of mine:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- I set the document to use two columns
+- I double-sided print and therefore must have an even number of pages for each letter group in order to bind the index properly
+- I adjust formating of the letter headers to fit my preferences ie (Aa, Bb, Cc) -> I typically use the Microsoft Word preformated "Title" option.
+- I like to create a coversheet with the date, and course information
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Print the document and take it to OfficeMax/Depot for binding.
 
-### `yarn eject`
+![alt tag](sample3.jpg)
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+I typically use a clear front and black backing; however, having a clear cover on each side can be handy if you bind a quick reference to the back of the index ie SANS packet header cheatsheet (what I used on my GSE index)
+???
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Get Certs
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+Profit $$$
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Common Issues
 
-## Learn More
+What follows are troubleshooting proceedures for some of the common issues experienced while using Voltaire.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### CSV Import Difficulties
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+**Problem:** When attempting to import a CSV the import dialog does not go away and when refreshing the page none of my data is present.
 
-### Code Splitting
+**Solution:** The CSV import feature, is a bit finicky. Your CSV will need to be formatted just right. In Excel it lets you put commas into your spreadsheet, but CSV uses them as delimiters you most likly have those (or some other odd characters) breaking your CSV. The easiest way to troubleshoot is to import sections (first 20 lines, then first 40, etc) of it until you find out what character is breaking it. Then find and replace that. Rinse and repeat. In the future I'll probably add a feature to let you know that your CSV formatting is off with troubleshooting instructions.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Exporting Problems
 
-### Analyzing the Bundle Size
+**Problem:** When attempting to export the index it does not properly alphabetize my index.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+**Solution:** There is currently a bug in Voltaire that requires you have at least one result in your index for every letter. (Note, index titles must begin with a capitalized letter). Create references for each with a blank description and your issue should resolve.
