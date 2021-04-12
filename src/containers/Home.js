@@ -244,8 +244,8 @@ class App extends Component {
           title: this.state.indexName
         }
         let ret = indexesRef.push(item);
-        const indexId = ret.path.o[3];
-        console.log(ret.path.o)
+        const indexId = ret.path.pieces_[3];
+        console.log(ret.path, "Issue Import Broken#23");
         this.setState({
           indexName: ''
         });
