@@ -29,6 +29,10 @@ import MenuBookIcon from '@material-ui/icons/MenuBook';
 import SettingsIcon from '@material-ui/icons/Settings';
 import LiveHelpIcon from '@material-ui/icons/LiveHelp';
 
+import BuildIcon from '@material-ui/icons/Build'
+import ChatBubbleIcon from '@material-ui/icons/ChatBubble'
+
+
 
 import firebase, { auth } from '../firebase.js';
 
@@ -107,7 +111,12 @@ const styles = theme => ({
   },
   buildButton: {
     color: "#fff",
+    border:"2px solid rgba(0,0,0,0.2)",
+    padding:"8px",
+    margin:"0px 0px 0px 20px",
+    fontWeight:"600"
   },
+
 });
 
 class Nav extends Component {
@@ -238,9 +247,22 @@ class Nav extends Component {
               <Typography variant="h6" className={classes.title}>
                 <Link className={classes.title} to="/Indexes">Voltaire</Link>
               </Typography>
-            <Link to="/BuildIndex">
+            <a href="https://discord.gg/VTjqSxkJqX">  
               <Button className={classes.buildButton} aria-controls="simple-menu" aria-haspopup="true">
-                Build Index
+                <ChatBubbleIcon
+                color="inherit"
+                className={clsx(classes.menuButton)}
+                />
+                Discord
+              </Button>
+            </a>
+            <Link to="/BuildIndex"> 
+              <Button className={classes.buildButton} aria-controls="simple-menu" aria-haspopup="true">
+              <BuildIcon
+              color="inherit"
+              className={clsx(classes.menuButton)}
+              />
+              Build Index
               </Button>
             </Link>
           </Toolbar>
@@ -259,8 +281,13 @@ class Nav extends Component {
              <ChevronLeftIcon />
            </IconButton>
          </div>
-         <Divider />
-         <List>
+         
+      <Divider />
+      <ListItem button>
+        <b>Navigation</b>
+      </ListItem>
+      <Divider />
+      <List>
        <Link to="/">
             <ListItem button>
              <ListItemIcon><AssignmentIcon /></ListItemIcon>
@@ -288,24 +315,30 @@ class Nav extends Component {
          </List>
          <Divider />
          <ListItem button>
-           <ListItemText primary="External Resources" />
+           <b>External Resources</b>
          </ListItem>
          <Divider />
-         <a href="https://www.opensecurity.io/blog/wargaming-giac-certifications">
+         <a href="https://discord.gg/VTjqSxkJqX">
          <ListItem button>
-           <ListItemText primary="Study Strategy Guide" />
+           <ListItemText primary="Discord" />
          </ListItem>
          </a>
-         <a href="https://www.opensecurity.io/blog/wargaming-giac-certifications">
+         <a href="https://opensecurity.io/wp-content/uploads/2021/06/giac-prep-guide.pdf">
          <ListItem button>
            <ListItemText primary="GIAC Prep Manual" />
          </ListItem>
          </a>
-         <a href="https://www.opensecurity.io/blog/wargaming-giac-certifications">
+         <a href="https://opensecurity.io/blog/wargaming-giac-certifications/">
+         <ListItem button>
+           <ListItemText primary="Study Strategy Guide" />
+         </ListItem>
+         </a>
+         <a href="https://tisiphone.net/2015/08/18/giac-testing/">
          <ListItem button>
            <ListItemText primary="Hacksforpancakes Blog" />
          </ListItem>
          </a>
+         
 
        </Drawer>
 

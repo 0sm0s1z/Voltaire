@@ -36,6 +36,18 @@ const styles = theme => ({
   root: {
     minWidth: 275,
   },
+  link:{
+    fontweight:"bold",
+    color:"grey",
+    fontDecoration:"underline"
+  },
+  body:{
+    marginTop: "30px", maxWidth: "100vw"
+  },
+  padding:{
+    marginTop: "16px"
+  }
+
 });
 
 
@@ -456,17 +468,17 @@ class GenerateIndex extends Component {
         spacing={3}
         >
           <Grid item xs={7}>
-            <Card className="red-border" style={{marginTop: "30px", maxWidth: "100vw"}}>
+            <Card className={"red-border", classes.body}>
               <Grid container direction="column">
                 <CardContent>
                 <Typography onClick={this.showOptions} className={classes.heading} variant={'h4'} gutterBottom>
                   Good luck on the exam!
                 </Typography>
                 <Typography onClick={this.showOptions} className={classes.heading} variant={'h6'} gutterBottom>
-                  Voltaire maintained by <u><a href="https://opensecurity.io">Open Security</a></u>
+                  Enjoy the tool? Check out our <u><a className={classes.link} href="https://discord.gg/VTjqSxkJqX">Discord</a></u>.
                 </Typography>
 
-                  <Button onClick={this.buildIndex} style={{marginTop: "16px"}} variant="contained" color="primary" className="voltaire-action">                    Download Index
+                  <Button onClick={this.buildIndex} className={classes.padding} variant="contained" color="primary" className="voltaire-action">                    Download Index
                   </Button>
 
                 </CardContent>

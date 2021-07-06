@@ -224,7 +224,7 @@ class Resources extends Component {
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Link href="https://www.opensecurity.io/s/giac-prep-guide.pdf">
+              <Link href="https://opensecurity.io/wp-content/uploads/2021/06/giac-prep-guide.pdf">
                 <Button
                   size="large"
                   variant="contained"
