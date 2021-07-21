@@ -200,17 +200,19 @@ class GenerateIndex extends Component {
       item = data[item]
       if(!item[1].readOnly){
         tmpList.push({
-           title: item[1].value,
-           description: item[2].value,
-           page: item[3].value,
-           book: item[4].value
+           title: item[1].value.toString(),
+           description: item[2].value.toString(),
+           page: item[3].value.toString(),
+           book: item[4].value.toString()
         });
       }
     }
 
     tmpList.sort(function(a, b){
-        if(a.title.toLowerCase() < b.title.toLowerCase()) return -1;
-        if(a.title.toLowerCase() > b.title.toLowerCase()) return 1;
+        a = a.title.toLowerCase()
+        b = b.title.toLowerCase()
+        if(a < b) return -1;
+        if(a > b) return 1;
         return 0;
      });
 
