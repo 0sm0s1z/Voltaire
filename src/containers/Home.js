@@ -20,7 +20,8 @@ import CardActions from '@material-ui/core/CardActions'
 import FormControl from '@material-ui/core/FormControl'
 import TextField from '@material-ui/core/TextField'
 import Box from '@material-ui/core/Box'
-
+import IconButton from '@material-ui/core/IconButton';
+import EditIcon from '@material-ui/icons/Edit'
 import Grid from '@material-ui/core/Grid';
 import AppBar from '@material-ui/core/AppBar';
 
@@ -29,6 +30,8 @@ import GIACLogo from "../assets/images/giaclogo.jpeg";
 import Modal from 'react-modal';
 import readXlsxFile from 'read-excel-file';
 import {OutTable, ExcelRenderer} from 'react-excel-renderer';
+import BuildIcon from "@material-ui/icons/Build";
+import clsx from "clsx";
 
 const styles = theme => ({
   root: {
@@ -131,6 +134,27 @@ const styles = theme => ({
   formControlWide:{
     margin: theme.spacing(0),
   },
+  truncate:{
+    overflow: 'hidden',
+    maxWidth: '100%',
+
+  },
+  truncateText:{
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    maxWidth: '100%',
+    textOverflow: 'clip',
+  },
+  editIcon: {
+    color: "#fff",
+    border:"2px solid rgba(255,255,255,0.2)",
+    borderRadius: "4px",
+    display:"inline-block",
+    float:"right",
+    height:"32px",
+    padding:"1px",
+    marginTop:"2px",
+  },
 });
 
 
@@ -142,12 +166,16 @@ class App extends Component {
       files: [],
       deleteId: "",
       deleteModal: false,
+      changeIndexNameModal: false,
       showModal: false,
       items: [],
       grid: [],
       user: null,
       uid: null,
       upload: '',
+
+      changeIndexName: '',
+      changeIndexId: '',
     }
     this.login = this.login.bind(this);
     this.logout = this.logout.bind(this);
@@ -158,6 +186,9 @@ class App extends Component {
     this.toggleModal = this.toggleModal.bind(this);
     this.toggleDelete = this.toggleDelete.bind(this);
     this.deletePending = this.deletePending.bind(this);
+    this.showChangeIndexName = this.showChangeIndexName.bind(this);
+    this.hideChangeIndexName = this.hideChangeIndexName.bind(this);
+    this.doChangeIndexName = this.doChangeIndexName.bind(this);
   }
   logout() {
      auth.signOut()
@@ -177,6 +208,26 @@ class App extends Component {
         });
       });
   }
+
+
+  doChangeIndexName() {
+const indexRef = firebase.database().ref('/users/' + this.state.uid + '/indexes/' + this.state.changeIndexID);
+    indexRef.update({title: this.state.changeIndexName})
+    this.setState({changeIndexName: ""})
+    this.setState({changeIndexID: ""})
+    this.setState({changeIndexNameModal: false})
+
+  }
+  showChangeIndexName(indexID) {
+    this.setState({changeIndexID: indexID})
+    this.setState({changeIndexNameModal: true})
+  }
+  hideChangeIndexName() {
+    this.setState({changeIndexID: ""})
+    this.setState({changeIndexNameModal: false})
+  }
+
+
   handleChange(e) {
     this.setState({
       [e.target.name]: e.target.value
@@ -395,10 +446,34 @@ class App extends Component {
               <Button  onClick={this.toggleDelete} size="large" variant="outlined" color="cancel">Cancel</Button>
           </CardActions>
         </Card>
+      </Modal>
+      <Modal
+          isOpen={this.state.changeIndexNameModal}
+          contentLabel="Change Index Name"
+          className="Modal"
+          overlayClassName="Overlay"
+      >
+
+        <Card className={classes.root}>
+          <CardContent>
+            <Typography className={classes.title} color="textSecondary" gutterBottom>
+              Rename your Index
+            </Typography>
+            <Typography className={classes.modText} align="center" variant="h6">
+              Would you like to rename this index? <br/> If so, please enter a new name below.
+            </Typography>
 
 
+            <Grid item>
+              <TextField name="changeIndexName" onChange={this.handleChange} value={this.state.changeIndexName}  variant="outlined" label="New Index Name" style={{"width":"100%"}}/>
+            </Grid>
 
-
+          </CardContent>
+          <CardActions style={{margin:"right"}}>
+            <Button  onClick={this.doChangeIndexName} size="large" variant="contained" color="primary">Change Name</Button>
+            <Button  onClick={this.hideChangeIndexName} size="large" variant="outlined" color="cancel">Cancel</Button>
+          </CardActions>
+        </Card>
       </Modal>
       <Container>
 
@@ -440,9 +515,16 @@ class App extends Component {
                   <div className="wrapper">
                      <ul>
                      <li>
-                        <Typography className={classes.heading} variant={'h6'} gutterBottom>
-                          <h3>{item.title}</h3>
+
+                        <Typography  className={classes.heading} variant={'h6'} gutterBottom>
+                          <h3>{item.title ?  item.title : " (No Index Name) "}
+
+
+                              <EditIcon className={classes.editIcon} onClick={() => this.showChangeIndexName(item.id)}/>
+
+                          </h3>
                         </Typography>
+
                         <div className="wrapper-body">
                         <center>
                            <img width="100px" height="100px" src={GIACLogo} />

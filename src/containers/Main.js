@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import firebase, { auth } from '../firebase.js';
-import Index from '../components/Index';
+import Index from '../components/Index.js';
 
 class Main extends Component {
   constructor() {

@@ -56,8 +56,10 @@ class BuildIndex extends Component {
     this.state = {
       indexName: '',
       grid: [],
-      indexExportData: []
+      indexExportData: [],
+      settings: {}
     }
+
   }
 
   render() {

@@ -8,7 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import Paper from '@material-ui/core/Paper';
 import Container from '@material-ui/core/Container';
-
+import Divider from '@material-ui/core/Divider';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import Select from '@material-ui/core/Select';
@@ -20,7 +20,9 @@ import FormHelperText from '@material-ui/core/FormHelperText';
 import Switch from '@material-ui/core/Switch';
 import TextField from '@material-ui/core/TextField';
 
+
 import firebase, { auth } from '../firebase.js';
+
 
 const styles = theme => ({
   root: {
@@ -38,23 +40,46 @@ const styles = theme => ({
   },
   formControl : {
     margin: theme.spacing(0),
-  }
+  },
+  tall : {
+    height: "100%"
+  },
+  bigPadding : {
+    padding: "0 2.25em"
+  },
+    smallPadding : {
+      padding: "0 1em"
+    },
+  maroon : {
+
+      backgroundColor:"#B11116",
+      color:"#B11116"
+    },
+    alert:{
+      color: "#B11116",
+      fontSize: "0.9em",
+      fontWeight: "bold",
+      padding: "0.5em 0"
+    }
 });
 
 class BuildWizard extends Component {
   constructor (props) {
      super(props)
      this.state = {
-       options: true,
+       options: false,
        type: 'Index Type',
        user: null,
        uid: null,
        title: "",
        name: "",
-       checkcolor: true,
-       checkcolumns: true,
-       checkdoublesided: true,
-       checkcoversheet: true,
+
+         settings: {
+            color: false, // color default to false (prioritize people to stay with Black theme)
+            columns: true,
+            doublesided: true,
+            coversheet: true,
+         },
        indexList: [],
        indexExportData: [],
        columns: [
@@ -64,10 +89,15 @@ class BuildWizard extends Component {
         { label: 'Rating', width: '20%' }
        ],
        grid: [],
+       warning : "",
      }
      this.showOptions = this.showOptions.bind(this);
+     this.hideOptions = this.hideOptions.bind(this);
      this.handleChange = this.handleChange.bind(this);
+     this.handleChangeOptions = this.handleChangeOptions.bind(this);
    }
+
+
    componentDidMount() {
      auth.onAuthStateChanged((user) => {
 
@@ -99,14 +129,21 @@ class BuildWizard extends Component {
        options: true
      });
    }
+   hideOptions() {
+        this.setState({
+            options: false
+        });
+    }
    handleChange(event: React.ChangeEvent<{ value: unknown }>) {
-     this.showOptions()
-     //console.log(this.state)
-     //console.log(event.target.name)
+      console.log("CHANGING", event.target.name, event.target.value)
+     if (event.target.name==="type") {
+         this.hideOptions()
+         if(event.target.value=="DOC") { this.showOptions() }
+     }
+
      if (event.target.value) {
        this.setState({
          [event.target.name]: event.target.value,
-
        });
      } else {
        this.setState({
@@ -115,7 +152,20 @@ class BuildWizard extends Component {
      }
 
    }
+   // function to handle the changing of settings object that will be passed to further components
+    handleChangeOptions(event: React.ChangeEvent<{ value: unknown }>) {
+        let settings = this.state.settings
+        if (event.target.value) {
+            settings[event.target.name] = event.target.value
+            this.setState({settings: settings})
+        } else {
+            settings[event.target.name] = !this.state.settings[event.target.name]
+            this.setState({settings: settings})
+        }
+    }
+
    exportIndex(id) {
+      this.setState({warning: ""})
       const indexesRef = firebase.database().ref('/users/' + this.state.uid + '/indexdata/' + id);
       indexesRef.on('value', (snapshot) => {
         let items = snapshot.val();
@@ -125,12 +175,20 @@ class BuildWizard extends Component {
            grid: items[item].grid
           });
         }
-        console.log(newState)
-        this.setState({
-          grid: newState[0].grid
-        });
+
+        try{
+            this.setState({
+                grid: newState[0].grid
+            });
+        }catch(e){
+            console.log(e)
+            this.setState({warning: "You are trying to export an empty index. Please add some data or select another index before exporting."})
+        }
+
+
      });
-     this.buildIndex();
+     if(this.state.grid.length > 0) { this.buildIndex() }
+
    }
    buildIndex() {
       const data = this.state.grid;
@@ -145,6 +203,7 @@ class BuildWizard extends Component {
             book: data[item][4]
          })
      }
+
      tmpList.sort(function(a, b){
          if(a.title.value < b.title.value) return -1;
          if(a.title.value > b.title.value) return 1;
@@ -167,132 +226,153 @@ class BuildWizard extends Component {
            >
              <Grid item xs={12}>
            <Card className="red-border" style={{marginTop: "30px"}}>
-             <CardContent >
-             <Typography onClick={this.showOptions} className={classes.heading} variant={'h4'} gutterBottom>
+             <CardContent className={classes.smallPadding}>
+             <Typography className={[classes.heading, classes.smallPadding]} variant={'h4'} gutterBottom>
                Index Builder
              </Typography>
-
+             <Divider className={classes.maroon}/>
              </CardContent>
 
 
              <Grid container justify="space-around" alignItems="stretch" >
-             <Grid item xs={7} s={7} md={9} lg={9} xl={9} className={classes.card}>
-               <Card>
+             <Grid item xs={12} className={classes.card}>
+
                 <center>
-                 <Typography onClick={this.showOptions} className={classes.heading} variant={'h6'} gutterBottom>
+                    {null ?
+                 <Typography className={classes.heading} variant={'h6'} gutterBottom>
                    Document Properties
-                 </Typography>
+                 </Typography> : "" }
+
                 </center>
 
-               <CardContent>
-               <FormControl variant="outlined" className={classes.formControlWide}>
-                 <TextField
-                   id="outlined-basic"
-                   label="Index Title"
-                   variant="outlined"
-                   name="title"
-                   value={this.state.title}
-                   onChange={this.handleChange}
-                 />
-               </FormControl>
-               </CardContent>
+                   <Grid container>
+                       <Grid item className={classes.card} xs={12} sm={this.state.options ? 8 : 12} md={this.state.options ? 9 : 12}>
+                           <Card>
+                           <CardContent>
+                           <FormControl variant="outlined" className={classes.formControlWide}>
+                             <TextField
+                               id="outlined-basic"
+                               label="Index Title"
+                               variant="outlined"
+                               name="title"
+                               value={this.state.title}
+                               onChange={this.handleChange}
+                             />
+                           </FormControl>
+                           </CardContent>
+                           <CardContent>
+                             <FormControl variant="outlined" className={classes.formControlWide}>
+                               <Select
+                                 name="type"
+                                 value={this.state.type}
+                                 onChange={this.handleChange}
+                               >
+                                 <MenuItem value="DOC">DOC</MenuItem>
+                                 <MenuItem value="JSON">JSON</MenuItem>
+                                 <MenuItem value="CSV">CSV</MenuItem>
+                               </Select>
+                               <FormHelperText>Export Format</FormHelperText>
+                             </FormControl>
+                           </CardContent>
+                           <CardContent>
+                             <FormControl variant="outlined" className={classes.formControlWide}>
+                               <Select
+                                 name="name"
+                                 value={this.state.name}
+                                 onChange={this.handleChange}
+                               >
+                               {this.state.indexList.map((item) => (
+                                 <MenuItem key={item.id} onClick={() => this.exportIndex(item.id)} value={item.id}>{item.title ? item.title : "(No Index Name)"}</MenuItem>
+                               ))}
+                               </Select>
+                               <FormHelperText>Index Name</FormHelperText>
+                               { this.state.warning ? <p className={classes.alert} severity="error">{this.state.warning}</p> : "" }
+                             </FormControl>
+                           </CardContent>
+                           </Card>
 
-               <CardContent>
-                 <FormControl variant="outlined" className={classes.formControlWide}>
-                   <Select
-                     name="type"
-                     value={this.state.type}
-                     onChange={this.handleChange}
-                   >
-                     <MenuItem value="DOC">DOC</MenuItem>
-                     <MenuItem value="PDF">PDF</MenuItem>
-                     <MenuItem value="JSON">JSON</MenuItem>
-                     <MenuItem value="CSV">CSV</MenuItem>
-                   </Select>
-                   <FormHelperText>Export Style</FormHelperText>
-                 </FormControl>
-               </CardContent>
+                   </Grid>
 
-               <CardContent>
-                 <FormControl variant="outlined" className={classes.formControlWide}>
-                   <Select
-                     name="name"
-                     value={this.state.name}
-                     onChange={this.handleChange}
-                   >
-                   {this.state.indexList.map((item) => (
-                     <MenuItem key={item.id} onClick={() => this.exportIndex(item.id)} value={item.id}>{item.title}</MenuItem>
-                   ))}
-                   </Select>
-                   <FormHelperText>Index Name</FormHelperText>
-                 </FormControl>
-               </CardContent>
+                   {this.state.options ?
+                       <Grid item xs={12} sm={4} md={3} lg={3} xl={3} className={classes.card}>
+                           <Card className={classes.tall}>
+                               <center>
+                                   <Typography className={classes.heading} variant={'h6'} gutterBottom>
+                                       DOC Export Options
+                                   </Typography>
+                                   <hr/>
+                               </center>
 
-                 <Grid item xs>
+
+                               <CardContent className={classes.bigPadding}>
+                                   <FormControlLabel
+                                       control={<Switch checked={this.state.settings.color} onChange={this.handleChangeOptions} name="color" color="primary"/>}
+                                       label="Color"
+                                       labelPlacement="end"
+                                       disabled={this.state.type != "DOC" ? true : false} //only allow color for DOC
+                                   />
+                               </CardContent>
+
+                               <CardContent className={classes.bigPadding}>
+                                   <FormControlLabel
+                                       control={<Switch checked={this.state.settings.columns} onChange={this.handleChangeOptions} name="columns" color="primary"/>}
+                                       label="Columns"
+                                       labelPlacement="end"
+                                       disabled={this.state.type != "DOC" ? true : false} //only allow columns for DOC
+                                   />
+                               </CardContent>
+
+                               {
+                                   // Commented out because it doesn't make sense to configure this from the Web Application. It's a setting in the printer.
+                                   // Also removed PDF File Types from the list of options.
+                               }
+                               { null ?
+                               <CardContent className={classes.bigPadding}>
+                                   <FormControlLabel
+                                       control={<Switch checked={this.state.settings.doublesided} onChange={this.handleChangeOptions} name="doublesided" color="primary"/>}
+                                       label="Double Sided"
+                                       labelPlacement="end"
+                                       disabled={this.state.type != "DOC" ? true : false} //only allow doublesided for DOC
+                                   />
+                               </CardContent> : "" }
+
+                               <CardContent className={classes.bigPadding}>
+                                   <FormControlLabel
+                                       control={<Switch color="primary" checked={this.state.settings.coversheet} onChange={this.handleChangeOptions} name="coversheet"/>}
+                                       label="Cover Sheet"
+                                       labelPlacement="end"
+                                       disabled={this.state.type != "DOC" ? true : false} //only allow coversheet for DOC
+                                   />
+                               </CardContent>
+                           </Card>
+                       </Grid>: null }
+                   </Grid>
+               <Grid item xs={2}>
                      <CardContent>
-                     <FormControl variant="outlined" className={classes.formControlWide}>
-                       <Link to={{
-                          pathname: "/DownloadIndex",
-                          state: {
-                             indexName: this.state.title,
-                             name: this.state.name,
-                             uid: this.state.uid
-                          }
-                       }}>
-                         <Button variant="contained" color="primary">
-                           Generate
-                         </Button>
-                       </Link>
+                     <FormControl variant="outlined">
+                         {  // Hide Export Button until Error is cleared (Don't allow user to export until they've selected an index that is non-empty.)
+                             (this.state.warning.length > 0) ? "" :
+                             <Link to={{
+                                 pathname: "/DownloadIndex",
+                                 state: {
+                                     indexName: this.state.title,
+                                     name: this.state.name,
+                                     uid: this.state.uid,
+                                     type: this.state.type,
+                                     settings: (this.state.type === "DOC") ? this.state.settings : {color:false, columns:false, doublesided:false, coversheet:false}
+                                 }
+                             }}>
+                                 <Button variant="contained" color="primary">
+                                     Generate
+                                 </Button>
+                             </Link>
+                         }
                        </FormControl>
                      </CardContent>
 
                </Grid>
-              </Card>
              </Grid>
-             {this.state.options ?
-             <Grid item xs={5} s={5} md={3} lg={3} xl={3} className={classes.card}>
-              <Card>
-               <center>
-               <Typography onClick={this.showOptions} className={classes.heading} variant={'h6'} gutterBottom>
-                 Options
-               </Typography>
-               </center>
 
-
-               <CardContent>
-                 <FormControlLabel
-                   control={<Switch checked={this.state.checkcolor} onChange={this.handleChange} name="checkcolor" color="primary"/>}
-                   label="Color"
-                   labelPlacement="end"
-                 />
-               </CardContent>
-
-               <CardContent>
-                 <FormControlLabel
-                   control={<Switch checked={this.state.checkcolumns} onChange={this.handleChange} name="checkcolumns" color="primary"/>}
-                   label="Columns"
-                   labelPlacement="end"
-                 />
-               </CardContent>
-
-               <CardContent>
-                 <FormControlLabel
-                   control={<Switch checked={this.state.checkdoublesided} onChange={this.handleChange} name="checkdoublesided" color="primary"/>}
-                   label="Double Sided"
-                   labelPlacement="end"
-                 />
-               </CardContent>
-
-               <CardContent>
-                 <FormControlLabel
-                   control={<Switch color="primary" checked={this.state.checkcoversheet} onChange={this.handleChange} name="checkcoversheet"/>}
-                   label="Cover Sheet"
-                   labelPlacement="end"
-                 />
-               </CardContent>
-               </Card>
-             </Grid>
-             : null }
 
     </Grid>
     </Card>
