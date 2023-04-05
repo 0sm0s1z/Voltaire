@@ -210,13 +210,16 @@ class App extends Component {
   }
 
 
-  doChangeIndexName() {
-const indexRef = firebase.database().ref('/users/' + this.state.uid + '/indexes/' + this.state.changeIndexID);
-    indexRef.update({title: this.state.changeIndexName})
-    this.setState({changeIndexName: ""})
-    this.setState({changeIndexID: ""})
-    this.setState({changeIndexNameModal: false})
-
+  doChangeIndexName(e) {
+    e.preventDefault();
+    const indexRef = firebase.database().ref('/users/' + this.state.uid + '/indexes/' + this.state.changeIndexID);
+    indexRef.update({
+      title: this.state.changeIndexName
+    });
+    this.setState({
+      changeIndexName: ''
+    });
+    this.hideChangeIndexName();
   }
   showChangeIndexName(indexID) {
     this.setState({changeIndexID: indexID})

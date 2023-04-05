@@ -141,11 +141,36 @@ class GenerateIndex extends Component {
            thematicBreak: true,
        });
    }
+    createParagraphsFromDescription(description: string): Paragraph[] {
+
+        if (description) {
+
+            if (!description.includes("\n")) return [new docx.Paragraph({
+                children: [new docx.TextRun({ text: description, spacing: {after:0}})],
+                spacing: {
+                    after: 0,
+                    before:0,
+                    line:240
+                }})];
+
+
+
+            return description.split("\n").map(line => new docx.Paragraph({
+                children: [new docx.TextRun({ text: line, spacing: {after:0}})],
+                spacing: {
+                    after: 0,
+                    before:0,
+                    line:240
+                }
+            }));
+        }
+    }
+
    createIndexSection(rows: any[]): Paragraph[] {
     if (rows) {
       return rows.map(
         (row) =>
-          new Paragraph({
+            new Paragraph({
             children: [
                 new TextRun({
                     text: row.title,
@@ -156,15 +181,14 @@ class GenerateIndex extends Component {
                     text: " [b" + row.book + "/p" + row.page + "] ",
                     italics: true,
                 }),
-                new TextRun({
-                    text: row.description,
-                }),
+
+                ...this.createParagraphsFromDescription(row.description)
+
             ],
-            spacing: {
-              after: 100,
-            }
-        }),
-      );
+                spacing: {
+                    after: 0,before:0,
+                    line:240
+                }}));
     } else {
       return new Paragraph({
           children: [new TextRun("s")],
@@ -290,6 +314,7 @@ class GenerateIndex extends Component {
                              },
                          },
                      },
+                        {id:"Normal",name:"Normal",basedOn:"Normal",next:"Normal",quickFormat:true,run:{size:24},paragraph:{spacing:{after:0}}},
                  ]
              }
          });
@@ -458,7 +483,7 @@ class GenerateIndex extends Component {
             let grid = this.state.grid;
             grid.shift(1) //remove headers
             let g = grid.map((r)=>{
-                return [r[1].value, r[2].value, r[3].value, r[4].value] // retrieve values from each row and plunk em in a new array.
+                return [r[1].value, r[2].value.replaceAll("\n", "Voltaire{LineBreak} "), r[3].value, r[4].value] // retrieve values from each row and plunk em in a new array.
             })
 
 
@@ -479,7 +504,6 @@ class GenerateIndex extends Component {
     return (
       <center>
       <Container>
-
         <Grid container
         direction="row"
         justify="center"
@@ -493,8 +517,6 @@ class GenerateIndex extends Component {
                   Good luck on the exam!
                 </Typography>
 
-
-
                 <Typography className={classes.heading} variant={'h6'} gutterBottom>
                   Enjoy the tool? Check out our <u><a className={classes.link} href="https://discord.gg/VTjqSxkJqX">Discord</a></u>.
                 </Typography>
@@ -506,9 +528,6 @@ class GenerateIndex extends Component {
                   <CardContent className={classes.box}>
                   <Button onClick={this.buildIndex} className={classes.padding} variant="contained" color="primary" className="voltaire-action">                    Download Index
                   </Button>
-
-
-
                 </CardContent>
               </Grid>
             </Card>
