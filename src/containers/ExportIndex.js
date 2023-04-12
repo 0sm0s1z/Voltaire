@@ -9,12 +9,14 @@ class ExportIndex extends Component {
     this.state = {
       indexName: '',
       grid: [],
-      indexExportData: []
+      indexExportData: [],
+      settings: {}
     }
     this.exportIndex = this.exportIndex.bind(this);
     this.buildIndex = this.buildIndex.bind(this);
   }
   componentDidMount() {
+      console.log(this.state)
      var id = this.props.location.state.indexId;
      const indexesRef = firebase.database().ref('/users/' + this.props.location.state.uid + '/indexdata/' + id);
      indexesRef.on('value', (snapshot) => {

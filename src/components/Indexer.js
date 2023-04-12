@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 import { Link } from 'react-router-dom';
 import ReactDataSheet from 'react-datasheet';
 import Modal from 'react-modal';
@@ -24,6 +24,10 @@ import Fab from '@material-ui/core/Fab';
 import '../css/indextable.css';
 
 import firebase, { auth } from '../firebase.js';
+import Switch from "@material-ui/core/Switch";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+
+
 
 Modal.setAppElement('#root');
 
@@ -67,6 +71,51 @@ const styles = theme => ({
   },
 });
 
+class CustomEditor extends PureComponent {
+    constructor (props) {
+        super(props)
+        this.handleChange = this.handleChange.bind(this)
+        this.handleKeyDown = this.handleKeyDown(this)
+    }
+
+    componentDidMount () {
+        this._input.focus()
+    }
+
+    handleChange (e) {
+        let cachedValue = e.target.value
+        this.props.onChange(cachedValue)
+    }
+
+    render () {
+        const {value, onKeyDown} = this.props
+        return (
+            <textarea
+                style={{maxWidth: '100%', minWidth: '100%', minHeight: '70px',padding:'0px', marginBottom:'0px', border:'0px', outline:'0px'}}
+                ref={input => { this._input = input }}
+                type='text'
+                className='data-editor'
+                value={value}
+
+                onChange={this.handleChange}
+                onKeyDownCapture={this.onKeyDown}
+            />
+        )
+    }
+
+    handleKeyDown (e) {
+        console.log("TEST")
+        if (e.which === 13 && !e.shiftKey) {
+            console.log("TEST")
+            e.persist()
+            this.setState({ e })
+        } else {
+            this.setState({ e: null })
+        }
+    }
+
+}
+
 class Indexer extends Component {
   constructor (props) {
      super(props)
@@ -78,6 +127,7 @@ class Indexer extends Component {
         newBook: '',
         indexImport: '',
         showModal: false,
+         textarea: true,
         user: null,
         uid: null,
         as: 'table',
@@ -103,6 +153,7 @@ class Indexer extends Component {
      this.handleImport = this.handleImport.bind(this);
      this.scrollToBottom = this.scrollToBottom.bind(this);
      this.scrollToTop = this.scrollToTop.bind(this);
+      this.handleChangeOptions = this.handleChangeOptions.bind(this);
    }
    componentDidMount() {
       auth.onAuthStateChanged((user) => {
@@ -147,6 +198,14 @@ class Indexer extends Component {
       [e.target.name]: e.target.value
      });
    }
+    handleChangeOptions(event) {
+        if (event.target.value) {
+            this.setState({"textarea": event.target.value})
+        }else{
+            this.setState({"textarea": !this.state.textarea})
+        }
+        console.log(this.state.textarea)
+    }
    handleSubmit(e) {
       e.preventDefault();
       var gridold = this.state.grid
@@ -212,6 +271,15 @@ class Indexer extends Component {
             <Typography className={classes.heading} variant={'h6'} gutterBottom>
               <h3>{this.props.indexTitle.indexName}</h3>
             </Typography>
+
+              <FormControlLabel style={{marginLeft:"auto"}}
+                  control={<Switch color="primary" checked={this.state.textarea} onChange={this.handleChangeOptions} name="textarea"/>}
+                  label="Multiline Editor"
+                  labelPlacement="end"
+
+              />
+
+
           </ToolBar>
           <form onSubmit={this.handleSubmit}>
             <Container>
@@ -241,18 +309,41 @@ class Indexer extends Component {
         <center>
         <Container>
         <Card className="red-border" style={{marginTop:"35px",zIndex:"0", backgroundColor:"white"}}>
-         <ReactDataSheet style={{width:"100%",margin:"auto",padding:"0px"}}
-            data={this.state.grid}
-            valueRenderer={(cell) => cell.value}
-            onCellsChanged={changes => {
-              const grid = this.state.grid.map(row => [...row])
-              changes.forEach(({cell, row, col, value}) => {
-                grid[row][col] = {...grid[row][col], value}
-              })
-              this.setState({grid})
-              this.updateGrid({grid})
-            }}
-          />
+            {
+            (this.state.textarea === true) ?
+                // Multi-line text editor
+                 <ReactDataSheet style={{width:"100%",margin:"auto",padding:"0px"}}
+                    data={this.state.grid}
+                    valueRenderer={(cell) => cell.value.toString().replaceAll("Voltaire{LineBreak} ", "\n")}
+                    onCellsChanged={changes => {
+                      const grid = this.state.grid.map(row => [...row])
+                      changes.forEach(({cell, row, col, value}) => {
+                        grid[row][col] = {...grid[row][col], value}
+                      })
+                      this.setState({grid})
+                      this.updateGrid({grid})
+                    }}
+
+                                 dataEditor={CustomEditor}/>
+
+            :
+                // Text Input Data Entry...
+
+                <ReactDataSheet style={{width:"100%",margin:"auto",padding:"0px"}}
+                                data={this.state.grid}
+                                valueRenderer={(cell) => cell.value.toString().replaceAll("\n", "Voltaire{LineBreak} ")}
+                                onCellsChanged={changes => {
+                                    const grid = this.state.grid.map(row => [...row])
+                                    changes.forEach(({cell, row, col, value}) => {
+                                        grid[row][col] = {...grid[row][col], value}
+                                    })
+                                    this.setState({grid})
+                                    this.updateGrid({grid})
+                                }}/>
+
+            }
+
+
         </Card>
         </Container>
         </center>

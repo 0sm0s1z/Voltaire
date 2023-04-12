@@ -12,7 +12,7 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import Menu from '@material-ui/core/Menu';
+import Box from '@material-ui/core/Box';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
 import Paper from '@material-ui/core/Paper';
@@ -114,7 +114,9 @@ const styles = theme => ({
     border:"2px solid rgba(0,0,0,0.2)",
     padding:"8px",
     margin:"0px 0px 0px 20px",
-    fontWeight:"600"
+    fontWeight:"600",
+      overflow: "hidden",
+      whitespace:"nowrap"
   },
 
 });
@@ -247,15 +249,17 @@ class Nav extends Component {
               <Typography variant="h6" className={classes.title}>
                 <Link className={classes.title} to="/Indexes">Voltaire</Link>
               </Typography>
-            <a href="https://discord.gg/VTjqSxkJqX">  
-              <Button className={classes.buildButton} aria-controls="simple-menu" aria-haspopup="true">
-                <ChatBubbleIcon
-                color="inherit"
-                className={clsx(classes.menuButton)}
-                />
-                Discord
-              </Button>
-            </a>
+              <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+                <a href="https://discord.gg/VTjqSxkJqX" >
+                  <Button className={classes.buildButton}  aria-controls="simple-menu" aria-haspopup="true">
+                    <ChatBubbleIcon
+                    color="inherit"
+                    className={clsx(classes.menuButton)}
+                    />
+                    Discord
+                  </Button>
+                </a>
+              </Box>
             <Link to="/BuildIndex"> 
               <Button className={classes.buildButton} aria-controls="simple-menu" aria-haspopup="true">
               <BuildIcon
@@ -328,12 +332,12 @@ class Nav extends Component {
            <ListItemText primary="GIAC Prep Manual" />
          </ListItem>
          </a>
-         <a href="https://opensecurity.io/blog/wargaming-giac-certifications/">
+         <a href="src/containers/Nav">
          <ListItem button>
            <ListItemText primary="Study Strategy Guide" />
          </ListItem>
          </a>
-         <a href="https://tisiphone.net/2015/08/18/giac-testing/">
+         <a href="src/containers/Nav">
          <ListItem button>
            <ListItemText primary="Hacksforpancakes Blog" />
          </ListItem>
