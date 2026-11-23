@@ -1,10 +1,6 @@
-// @flow
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faWindows } from '@fortawesome/free-brands-svg-icons';
 import clsx from 'clsx';
-
 import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -12,11 +8,6 @@ import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import Box from '@material-ui/core/Box';
-import MenuItem from '@material-ui/core/MenuItem';
-import MenuList from '@material-ui/core/MenuList';
-import Paper from '@material-ui/core/Paper';
-
 import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
 import Divider from '@material-ui/core/Divider';
@@ -27,14 +18,12 @@ import ListItemText from '@material-ui/core/ListItemText';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import MenuBookIcon from '@material-ui/icons/MenuBook';
 import SettingsIcon from '@material-ui/icons/Settings';
-import LiveHelpIcon from '@material-ui/icons/LiveHelp';
+import BuildIcon from '@material-ui/icons/Build';
+import OpenInNewIcon from '@material-ui/icons/OpenInNew';
+import Box from '@material-ui/core/Box';
 
-import BuildIcon from '@material-ui/icons/Build'
-import ChatBubbleIcon from '@material-ui/icons/ChatBubble'
-
-
-
-import firebase, { auth } from '../firebase.js';
+import { auth } from '../firebase.js';
+import { DeprecationBanner, NEW_SITE_URL } from '../components/DeprecationGuard';
 
 const drawerWidth = 240;
 
@@ -42,14 +31,12 @@ const styles = theme => ({
   root: {
     flexGrow: 1,
   },
-  menuButton: {
-    marginRight: theme.spacing(2),
-  },
   title: {
     flexGrow: 1,
-    fontFamily: "Brush Script MT, Brush Script Std, cursive",
-    fontSize: "36px",
+    fontFamily: "'Fredoka One', cursive",
+    fontSize: "30px",
     color: "#fff",
+    textDecoration: "none",
   },
   appBar: {
     transition: theme.transitions.create(['margin', 'width'], {
@@ -83,150 +70,76 @@ const styles = theme => ({
     display: 'flex',
     alignItems: 'center',
     padding: theme.spacing(0, 1),
-    // necessary for content to be below app bar
     ...theme.mixins.toolbar,
     justifyContent: 'flex-end',
   },
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing(3),
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    marginLeft: -drawerWidth,
-  },
-  contentShift: {
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginLeft: 0,
-  },
-  buildMenu: {
-    width: "420px",
-    marginTop: "30px",
-    textDecoration: "none",
-    color: "inherit"
-  },
   buildButton: {
     color: "#fff",
-    border:"2px solid rgba(0,0,0,0.2)",
-    padding:"8px",
-    margin:"0px 0px 0px 20px",
-    fontWeight:"600",
-      overflow: "hidden",
-      whitespace:"nowrap"
+    border: "2px solid rgba(255,255,255,0.35)",
+    padding: "6px 12px",
+    margin: "0px 0px 0px 12px",
+    fontWeight: 600,
+    whiteSpace: "nowrap",
+    textTransform: "none",
   },
-
+  newSiteButton: {
+    backgroundColor: "#FA6900",
+    color: "#fff",
+    padding: "6px 14px",
+    margin: "0px 0px 0px 12px",
+    fontWeight: 700,
+    whiteSpace: "nowrap",
+    textTransform: "none",
+    '&:hover': {
+      backgroundColor: '#d75c04',
+    },
+  },
+  spacer: {
+    height: '126px',
+  },
 });
 
 class Nav extends Component {
-   constructor() {
-     super();
-     this.state = {
-       indexList: [],
-       indexExportData: [],
-       grid: [],
-       open: false,
-       anchorEl: null,
-       //anchorEl: React.useState<null | HTMLElement>(null),
-     }
-     this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
-     this.handleDrawerClose = this.handleDrawerClose.bind(this);
-     this.handleClose = this.handleClose.bind(this);
-     this.handleClick = this.handleClick.bind(this);
-   }
-   componentDidMount() {
-     auth.onAuthStateChanged((user) => {
-       if (user) {
-          this.setState({ user });
-          this.setState({ uid: auth.getUid() });
+  constructor() {
+    super();
+    this.state = {
+      user: null,
+      open: false,
+    };
+    this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
+    this.handleDrawerClose = this.handleDrawerClose.bind(this);
+    this.logout = this.logout.bind(this);
+  }
 
-          let table = '/users/' + auth.getUid() + '/indexes';
-          const indexesRef = firebase.database().ref(table);
-          indexesRef.on('value', (snapshot) => {
-            let items = snapshot.val();
-            let newState = [];
-            for (let item in items) {
-              newState.push({
-                id: item,
-                title: items[item].title,
-                user: items[item].user
-              });
-            }
-            this.setState({
-              indexList: newState
-            });
-          });
-       }
-     });
-   }
-   exportIndex(id) {
-      const indexesRef = firebase.database().ref('/users/' + this.state.uid + '/indexdata/' + id);
-      indexesRef.on('value', (snapshot) => {
-        let items = snapshot.val();
-        let newState = [];
-        for (let item in items) {
-          newState.push({
-           grid: items[item].grid
-          });
-        }
-        this.setState({
-          grid: newState[0].grid
-        });
-     });
-     this.buildIndex();
-   }
-   buildIndex() {
-      const data = this.state.grid;
-      let tmpList = [];
+  componentDidMount() {
+    this.unsubscribe = auth.onAuthStateChanged((user) => {
+      this.setState({ user: user || null });
+    });
+  }
 
-      //Build and Sort List
-      for (let item in data) {
-         tmpList.push({
-            title: data[item][1],
-            description: data[item][2],
-            page: data[item][3],
-            book: data[item][4]
-         })
-     }
-     tmpList.sort(function(a, b){
-         if(a.title.value < b.title.value) return -1;
-         if(a.title.value > b.title.value) return 1;
-         return 0;
-      });
-      this.setState({
-       indexExportData: tmpList
-      });
-      console.log(tmpList);
-   }
-   handleDrawerClose() {
-     this.setState({
-      open: false
-     });
-   }
-   handleDrawerOpen() {
-     this.setState({
-      open: true
-     });
-   }
+  componentWillUnmount() {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+  }
 
-   handleClick(event: React.MouseEvent<HTMLButtonElement>) {
-     this.setState({
-      anchorEl: event.currentTarget
-     });
-   };
-   handleClose() {
-     this.setState({
-      anchorEl: false
-     });
-   };
+  handleDrawerClose() {
+    this.setState({ open: false });
+  }
+
+  handleDrawerOpen() {
+    this.setState({ open: true });
+  }
+
+  logout() {
+    auth.signOut().then(() => {
+      this.setState({ user: null });
+      window.location.href = '/';
+    });
+  }
 
   render() {
     const { classes } = this.props;
-
-
 
     return (
       <div className={classes.root}>
@@ -236,118 +149,108 @@ class Nav extends Component {
             [classes.appBarShift]: this.state.open,
           })}
         >
+          <DeprecationBanner />
           <Toolbar>
             <IconButton
-             color="inherit"
-             aria-label="open drawer"
-             onClick={this.handleDrawerOpen}
-             edge="start"
-             className={clsx(classes.menuButton, this.state.open && classes.hide)}
+              color="inherit"
+              aria-label="open drawer"
+              onClick={this.handleDrawerOpen}
+              edge="start"
+              className={clsx(classes.menuButton, this.state.open && classes.hide)}
             >
               <MenuIcon />
             </IconButton>
-              <Typography variant="h6" className={classes.title}>
-                <Link className={classes.title} to="/Indexes">Voltaire</Link>
-              </Typography>
-              <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
-                <a href="https://discord.gg/VTjqSxkJqX" >
-                  <Button className={classes.buildButton}  aria-controls="simple-menu" aria-haspopup="true">
-                    <ChatBubbleIcon
-                    color="inherit"
-                    className={clsx(classes.menuButton)}
-                    />
-                    Discord
-                  </Button>
-                </a>
-              </Box>
-            <Link to="/BuildIndex"> 
-              <Button className={classes.buildButton} aria-controls="simple-menu" aria-haspopup="true">
-              <BuildIcon
-              color="inherit"
-              className={clsx(classes.menuButton)}
-              />
-              Build Index
+            <Typography variant="h6" className={classes.title}>
+              <Link className={classes.title} to="/Indexes">Voltaire (Legacy Read-Only)</Link>
+            </Typography>
+            <Box display={{ xs: 'none', sm: 'block' }}>
+              <a href={NEW_SITE_URL} style={{ textDecoration: 'none' }}>
+                <Button className={classes.newSiteButton} endIcon={<OpenInNewIcon />}>
+                  training.opensecurity.com
+                </Button>
+              </a>
+            </Box>
+            {this.state.user ? (
+              <Link to="/BuildIndex" style={{ textDecoration: 'none' }}>
+                <Button className={classes.buildButton}>
+                  <BuildIcon color="inherit" style={{ marginRight: 6 }} />
+                  Export / Build Index
+                </Button>
+              </Link>
+            ) : null}
+            {this.state.user ? (
+              <Button className={classes.buildButton} onClick={this.logout}>
+                Logout
               </Button>
-            </Link>
+            ) : null}
           </Toolbar>
         </AppBar>
+        <div className={classes.spacer} />
+
         <Drawer
-         className={classes.drawer}
-         variant="persistent"
-         anchor="left"
-         open={this.state.open}
-         classes={{
-           paper: classes.drawerPaper,
-         }}
-       >
-         <div className={classes.drawerHeader}>
-           <IconButton onClick={this.handleDrawerClose}>
-             <ChevronLeftIcon />
-           </IconButton>
-         </div>
-         
-      <Divider />
-      <ListItem button>
-        <b>Navigation</b>
-      </ListItem>
-      <Divider />
-      <List>
-       <Link to="/">
-            <ListItem button>
-             <ListItemIcon><AssignmentIcon /></ListItemIcon>
-             <ListItemText primary="Indexes" />
-            </ListItem>
-          </Link>
-        <Link to="/Resources">
-           <ListItem button>
-            <ListItemIcon><MenuBookIcon /></ListItemIcon>
-            <ListItemText primary="Resources" />
-           </ListItem>
-         </Link>
-       <Link to="/Resources">
-           <ListItem button>
-            <ListItemIcon><LiveHelpIcon /></ListItemIcon>
-            <ListItemText primary="FAQ" />
-           </ListItem>
-         </Link>
-       <Link to="/Settings">
-           <ListItem button>
-            <ListItemIcon><SettingsIcon /></ListItemIcon>
-            <ListItemText primary="Settings" />
-           </ListItem>
-         </Link>
-         </List>
-         <Divider />
-         <ListItem button>
-           <b>External Resources</b>
-         </ListItem>
-         <Divider />
-         <a href="https://discord.gg/VTjqSxkJqX">
-         <ListItem button>
-           <ListItemText primary="Discord" />
-         </ListItem>
-         </a>
-         <a href="https://opensecurity.io/wp-content/uploads/2021/06/giac-prep-guide.pdf">
-         <ListItem button>
-           <ListItemText primary="GIAC Prep Manual" />
-         </ListItem>
-         </a>
-         <a href="src/containers/Nav">
-         <ListItem button>
-           <ListItemText primary="Study Strategy Guide" />
-         </ListItem>
-         </a>
-         <a href="src/containers/Nav">
-         <ListItem button>
-           <ListItemText primary="Hacksforpancakes Blog" />
-         </ListItem>
-         </a>
-         
+          className={classes.drawer}
+          variant="persistent"
+          anchor="left"
+          open={this.state.open}
+          classes={{
+            paper: classes.drawerPaper,
+          }}
+        >
+          <div className={classes.drawerHeader}>
+            <IconButton onClick={this.handleDrawerClose}>
+              <ChevronLeftIcon />
+            </IconButton>
+          </div>
 
-       </Drawer>
+          <Divider />
+          <ListItem>
+            <b>New Platform</b>
+          </ListItem>
+          <Divider />
+          <List>
+            <a href={NEW_SITE_URL} style={{ textDecoration: 'none', color: 'inherit' }}>
+              <ListItem button>
+                <ListItemIcon><OpenInNewIcon style={{ color: '#FA6900' }} /></ListItemIcon>
+                <ListItemText primary="training.opensecurity.com" secondary="Active platform" />
+              </ListItem>
+            </a>
+          </List>
 
+          <Divider />
+          <ListItem>
+            <b>Legacy Data Recovery</b>
+          </ListItem>
+          <Divider />
+          <List>
+            <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <ListItem button>
+                <ListItemIcon><AssignmentIcon /></ListItemIcon>
+                <ListItemText primary="My Indexes (Read-Only)" />
+              </ListItem>
+            </Link>
+            <Link to="/BuildIndex" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <ListItem button>
+                <ListItemIcon><BuildIcon /></ListItemIcon>
+                <ListItemText primary="Export / Build Index" />
+              </ListItem>
+            </Link>
+            <Link to="/Settings" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <ListItem button>
+                <ListItemIcon><SettingsIcon /></ListItemIcon>
+                <ListItemText primary="Export History" />
+              </ListItem>
+            </Link>
+            <Link to="/Resources" style={{ textDecoration: 'none', color: 'inherit' }}>
+              <ListItem button>
+                <ListItemIcon><MenuBookIcon /></ListItemIcon>
+                <ListItemText primary="Resources" />
+              </ListItem>
+            </Link>
+          </List>
+        </Drawer>
       </div>
     );
   }
 }
+
 export default withStyles(styles)(Nav);

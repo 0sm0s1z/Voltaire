@@ -1,254 +1,283 @@
 import React, { Component } from 'react';
-import ReactDataSheet from 'react-datasheet';
-import Modal from 'react-modal';
-
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Container from '@material-ui/core/Container';
-
 import Card from '@material-ui/core/Card';
-import CardActionArea from '@material-ui/core/CardActionArea';
-import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
-import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import Link from '@material-ui/core/Link';
-import Icon from '@material-ui/core/Icon';
-import DownloadIcon from '@material-ui/icons/CloudDownload';
+import Divider from '@material-ui/core/Divider';
+import WarningIcon from '@material-ui/icons/Warning';
+import OpenInNewIcon from '@material-ui/icons/OpenInNew';
+import LockIcon from '@material-ui/icons/Lock';
 
 import IndexImg from "../assets/images/indexes.png";
 import OSBlack from "../assets/images/os-black-flat.png";
-import GuideBanner from "../assets/images/guide-banner.png";
 
 import Home from '../containers/Home';
+import {
+  DeprecationBanner,
+  DeprecationRiskModal,
+  NEW_SITE_URL,
+  redirectToNewSite,
+  signInExistingUser,
+} from './DeprecationGuard';
 
 import '../css/indextable.css';
-
-import firebase, { auth, provider } from '../firebase.js';
-
-Modal.setAppElement('#root');
+import { auth } from '../firebase.js';
 
 const styles = theme => ({
   root: {
     minWidth: 275,
   },
   main: {
-    marginTop: "130px",
+    marginTop: "32px",
+    marginBottom: "48px",
   },
-  title: {
-    fontSize: 14,
-  },
-  pos: {
-    marginBottom: 12,
-  },
-  button: {
-    margin: theme.spacing(1),
-  },
-  certCard: {
+  primaryCta: {
     width: '100%',
-    maxWidth: 500,
-    borderRadius: "16px", // 16px
-    transition: '0.3s',
-    boxShadow: '0px 14px 80px rgba(34, 35, 58, 0.2)',
-    position: 'relative',
-    overflow: 'initial',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    textAlign: 'center',
-    paddingLeft: 8,
-    paddingRight: 8,
-    background:
-      'linear-gradient(34deg, rgba(55,16,83,1) 0%, rgba(162,73,190,1) 29%, rgba(33,16,83,1) 92%)',
-  },
-  media: {
-    flexShrink: 0,
-    width: '30%',
-    paddingTop: '30%',
-    marginTop: '10px',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-  },
-  overline: {
-    lineHeight: 2,
-    color: '#ffffff',
-    fontWeight: 'bold',
-    fontSize: '0.625rem',
-    opacity: 0.7,
-  },
-  heading: {
-    fontWeight: '900',
-    color: '#ffffff',
-    letterSpacing: 0.5,
-  },
-  certButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    borderRadius: 100,
-    paddingLeft: 32,
-    paddingRight: 32,
-    color: '#ffffff',
+    borderRadius: '6px',
+    backgroundColor: '#FA6900',
+    color: '#fff',
+    fontSize: '15px',
+    fontWeight: 700,
+    padding: '12px 18px',
     textTransform: 'none',
-    width: '100%',
+    marginBottom: '12px',
     '&:hover': {
-      backgroundColor: 'rgba(255, 255, 255, 0.32)',
+      backgroundColor: '#d75c04',
     },
   },
-  topColumn: {
-    marginTop: "10px",
-  },
-  button: {
-    borderRadius: '4px',
-    minWidth: '88px',
-    backgroundColor: '#FA6900',
-    cursor: 'pointer',
-    border: '0',
-    minWidth: '120px',
+  newUserCta: {
+    width: '100%',
+    borderRadius: '6px',
+    backgroundColor: '#B11116',
     color: '#fff',
     fontSize: '14px',
-    boxShadow: '0 2px 5px 0 rgba(0,0,0,.26)',
-    padding: '10px 6px',
+    fontWeight: 600,
+    padding: '10px 18px',
+    textTransform: 'none',
+    marginBottom: '12px',
     '&:hover': {
-      backgroundColor: '#d75c04'
+      backgroundColor: '#8d0d11',
     },
+  },
+  recoveryBtn: {
+    width: '100%',
+    borderRadius: '6px',
+    borderColor: '#666',
+    color: '#333',
+    fontSize: '13px',
+    fontWeight: 600,
+    padding: '10px 16px',
+    textTransform: 'none',
   },
 });
 
-class Resources extends Component {
+class Index extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      user: null,
+      uid: null,
+      authChecked: false,
+      showRiskModal: false,
+      authError: '',
+    };
+    this.openRecoveryModal = this.openRecoveryModal.bind(this);
+    this.closeRecoveryModal = this.closeRecoveryModal.bind(this);
+    this.handleAcceptRiskAndLogin = this.handleAcceptRiskAndLogin.bind(this);
+  }
 
-  constructor (props) {
-     super(props)
+  componentDidMount() {
+    this.unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.setState({ user, uid: user.uid, authChecked: true });
+      } else {
+        this.setState({ user: null, uid: null, authChecked: true });
+      }
+    });
+  }
 
-     this.state = {
-        newTitle: '',
-        newDescription: '',
-        newPage: '',
-        newBook: '',
-        indexImport: '',
-        showModal: false,
-        user: null,
-        uid: null,
-        as: 'table'
-     }
-     this.login = this.login.bind(this);
-   }
-   componentDidMount() {
-     auth.onAuthStateChanged((user) => {
-       if (user) {
-          this.setState({ user });
-          this.setState({ uid: auth.getUid() });
+  componentWillUnmount() {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+  }
 
-          let table = '/users/' + auth.getUid() + '/indexes';
-          const indexesRef = firebase.database().ref(table);
-          indexesRef.on('value', (snapshot) => {
-            let items = snapshot.val();
-            let newState = [];
-            for (let item in items) {
-              newState.push({
-                id: item,
-                title: items[item].title,
-                user: items[item].user
-              });
-            }
-            this.setState({
-              items: newState
-            });
-          });
+  openRecoveryModal() {
+    this.setState({ showRiskModal: true, authError: '' });
+  }
 
-       }
-     });
-   }
-   login() {
-     auth.signInWithRedirect(provider)
-       .then((result) => {
-         const user = result.user;
-         console.log(user)
-         this.setState({
-           user
-         });
-       });
-   }
+  closeRecoveryModal() {
+    this.setState({ showRiskModal: false });
+  }
 
+  async handleAcceptRiskAndLogin() {
+    this.setState({ showRiskModal: false, authError: '' });
+    try {
+      const user = await signInExistingUser();
+      if (user) {
+        this.setState({ user, uid: user.uid });
+      }
+    } catch (error) {
+      if (error && error.code === 'auth/popup-closed-by-user') {
+        return;
+      }
+      this.setState({
+        authError:
+          'Unable to sign in. New account creation is permanently disabled — please use training.opensecurity.com.',
+      });
+    }
+  }
 
   render() {
     const { classes } = this.props;
+
+    if (this.state.user) {
+      return <Home />;
+    }
+
     return (
       <div>
-      {this.state.user ?
-        <Home />
-        :
-        <Container className={classes.main}>
-          <Grid container
-          spacing={3}
-          direction="row"
-          justify="flex-start"
-          style={{ backgroundImage: `url(${OSBlack})`, backgroundRepeat: 'no-repeat', backgroundPosition: 'center', backgroundSize: '35%' }}
+        <DeprecationBanner />
+
+        <DeprecationRiskModal
+          open={this.state.showRiskModal}
+          onClose={this.closeRecoveryModal}
+          onAcceptRisk={this.handleAcceptRiskAndLogin}
+          acceptLabel="Accept Risk & Sign In to Recover Data (Read-Only)"
+        />
+
+        <Container className={classes.main} maxWidth="lg">
+          <Card
+            style={{
+              border: '3px solid #B11116',
+              backgroundColor: '#fff5f5',
+              marginBottom: '32px',
+            }}
           >
-            <Grid item >
-              <img width="500" src={IndexImg} />
-            </Grid>
-            <Grid item xs={12} sm={5}>
-              <Grid container
-                spacing={3}
-                direction="column"
-                alignItems="center"
-                className={classes.topColumn}
+            <CardContent style={{ padding: '24px 28px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                <WarningIcon style={{ color: '#B11116', fontSize: 36 }} />
+                <Typography variant="h4" component="h1" style={{ color: '#7f0000', fontWeight: 800 }}>
+                  Legacy Voltaire Has Been Permanently Retired
+                </Typography>
+              </div>
+              <Typography variant="body1" style={{ color: '#222', fontSize: '16px', lineHeight: 1.6, marginBottom: '16px' }}>
+                This legacy application is deprecated and no longer active. All indexing, course tools,
+                and new user accounts have moved to{' '}
+                <a
+                  href={NEW_SITE_URL}
+                  style={{ color: '#B11116', fontWeight: 700, textDecoration: 'underline' }}
+                >
+                  training.opensecurity.com
+                </a>
+                . Creating new accounts and adding or editing data on this legacy site are permanently disabled.
+              </Typography>
+              <Button
+                variant="contained"
+                size="large"
+                onClick={redirectToNewSite}
+                endIcon={<OpenInNewIcon />}
+                style={{
+                  backgroundColor: '#FA6900',
+                  color: '#ffffff',
+                  fontWeight: 700,
+                  textTransform: 'none',
+                  fontSize: '16px',
+                  padding: '12px 28px',
+                }}
               >
-                <Grid>
-                  <br />
-                  <br />
-                  <br />
-                  <br />
-                  <br />
-                  <br />
-                  <br />
-                  <Card style={{marginTop: "30px", maxWidth: "100vw"}}>
-                    <CardActionArea>
-                      <CardContent>
-                        <Typography gutterBottom variant="h5" component="h2">
-                          Login to get started now!
-                        </Typography>
-                        <Typography variant="body2" color="textSecondary" component="p">
-                          Indexing the study method most highly recommended by SANS Instructors. Voltaire is here to help.
-                        </Typography>
-                        <br/>
+                Go to training.opensecurity.com
+              </Button>
+            </CardContent>
+          </Card>
 
-                        <Button variant="contained" className={classes.button} onClick={this.login}>Log In</Button>
-
-                      </CardContent>
-                    </CardActionArea>
-                  </Card>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
           <Grid
             container
+            spacing={4}
             direction="row"
             justify="center"
             alignItems="center"
-            style={{ background: 'rgb(238,174,202)', background: 'radial-gradient(circle, rgb(255, 234, 253) 38%, rgba(254, 251, 255, 0.643) 70%)', paddingTop: "30px", paddingBottom: "30px", borderTop: "2px solid #cfe8fc" }}
+            style={{
+              backgroundImage: `url(${OSBlack})`,
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'center',
+              backgroundSize: '30%',
+            }}
           >
-            <Grid container direction="row" justify="center" alignItems="center">
-              <Grid item xs={6}>
-                <center>
-                  <Typography gutterBottom variant="h5" component="h2">
-                    How to Index with Voltaire
+            <Grid item xs={12} md={6} style={{ textAlign: 'center' }}>
+              <img
+                style={{ maxWidth: '100%', width: '460px', opacity: 0.85 }}
+                src={IndexImg}
+                alt="Voltaire Legacy Indexing"
+              />
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Card style={{ borderTop: '4px solid #B11116', boxShadow: '0 6px 24px rgba(0,0,0,0.12)' }}>
+                <CardContent style={{ padding: '28px' }}>
+                  <Typography gutterBottom variant="h5" component="h2" style={{ fontWeight: 700 }}>
+                    Move to training.opensecurity.com
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" paragraph>
+                    Looking to create an account or build a new GIAC exam index? Use our active platform instead:
                   </Typography>
 
-                  <iframe width="560" height="315" src="https://www.youtube.com/embed/bHpkTArlXWc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                  <Typography variant="body2" color="textSecondary" component="p">
-                    Voltaire is a web-based indexing tool for GIAC certification examinations. Creating an index with Voltaire is a simple three phase process involving: documentation/note-taking, sorting & normalization, and word processing.
+                  <Button
+                    variant="contained"
+                    className={classes.primaryCta}
+                    onClick={redirectToNewSite}
+                    endIcon={<OpenInNewIcon />}
+                  >
+                    Go to training.opensecurity.com (Recommended)
+                  </Button>
+
+                  <Button
+                    variant="contained"
+                    className={classes.newUserCta}
+                    onClick={redirectToNewSite}
+                    endIcon={<OpenInNewIcon />}
+                  >
+                    New User / Create Account → Redirect to New Site
+                  </Button>
+
+                  <Divider style={{ margin: '20px 0' }} />
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <LockIcon fontSize="small" style={{ color: '#7f0000' }} />
+                    <Typography variant="subtitle2" style={{ fontWeight: 700, color: '#7f0000' }}>
+                      Existing Users Only — Read-Only Data Recovery
+                    </Typography>
+                  </div>
+                  <Typography variant="body2" color="textSecondary" paragraph>
+                    If you already have a legacy account from within the past year and need to export
+                    your existing index, you may sign in strictly in <strong>read-only mode</strong>.
+                    New accounts are blocked and automatically redirected to training.opensecurity.com.
                   </Typography>
-                </center>
-              </Grid>
+
+                  {this.state.authError ? (
+                    <Typography variant="body2" style={{ color: '#B11116', fontWeight: 600, marginBottom: '12px' }}>
+                      {this.state.authError}
+                    </Typography>
+                  ) : null}
+
+                  <Button
+                    variant="outlined"
+                    className={classes.recoveryBtn}
+                    onClick={this.openRecoveryModal}
+                  >
+                    Existing Users: Sign In to Recover Data (Read-Only)
+                  </Button>
+                </CardContent>
+              </Card>
             </Grid>
           </Grid>
-
         </Container>
-        }
       </div>
     );
   }
 }
-export default withStyles(styles)(Resources);
+
+export default withStyles(styles)(Index);

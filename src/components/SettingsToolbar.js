@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
-
-import clsx from 'clsx';
+import { Link } from 'react-router-dom';
 import { withStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
+import OpenInNewIcon from '@material-ui/icons/OpenInNew';
+import { NEW_SITE_URL } from './DeprecationGuard';
 
 const styles = theme => ({
   root: {
@@ -13,47 +14,38 @@ const styles = theme => ({
 });
 
 class SettingsToolbar extends Component {
-  constructor (props) {
-     super(props)
-   }
-
-
   render() {
-    const { classes } = this.props;
     return (
-      <div>
-        <Grid container
-        direction="row"
-        justify="center"
-        >
-          <Typography variant="body2" color="textSecondary" component="p">
-            Settings Toolbar
-          </Typography>
-        </Grid>
-        <Grid container
-        spacing={1}
-        direction="row"
-        justify="center"
-        style={{marginTop: '10px'}}
-        >
-          <Grid item xs={2}>
-            <Button variant="contained" color="primary">
-                Import
-            </Button>
+      <div style={{ marginBottom: '16px', textAlign: 'center' }}>
+        <Typography variant="h6" style={{ color: '#7f0000', fontWeight: 700 }} gutterBottom>
+          Legacy Data Recovery &amp; History Export (Read-Only)
+        </Typography>
+        <Typography variant="body2" color="textSecondary" paragraph>
+          All write/edit/import operations are permanently disabled. Export your remaining data below or move to training.opensecurity.com.
+        </Typography>
+        <Grid container spacing={2} direction="row" justify="center">
+          <Grid item>
+            <Link to="/Indexes" style={{ textDecoration: 'none' }}>
+              <Button variant="outlined" color="primary">
+                My Indexes
+              </Button>
+            </Link>
           </Grid>
-          <Grid item xs={2}>
-            <Button variant="contained" color="primary">
-              Export
-            </Button>
+          <Grid item>
+            <Link to="/BuildIndex" style={{ textDecoration: 'none' }}>
+              <Button variant="contained" color="secondary">
+                Export / Build Index
+              </Button>
+            </Link>
           </Grid>
-          <Grid item xs={2}>
-            <Button variant="contained" color="primary">
-              Build Index
-            </Button>
-          </Grid>
-          <Grid item xs={2}>
-            <Button variant="contained" color="primary">
-              Templates
+          <Grid item>
+            <Button
+              variant="contained"
+              href={NEW_SITE_URL}
+              endIcon={<OpenInNewIcon />}
+              style={{ backgroundColor: '#FA6900', color: '#fff', fontWeight: 700 }}
+            >
+              Go to training.opensecurity.com
             </Button>
           </Grid>
         </Grid>
@@ -61,4 +53,5 @@ class SettingsToolbar extends Component {
     );
   }
 }
+
 export default withStyles(styles)(SettingsToolbar);

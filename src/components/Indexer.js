@@ -1,358 +1,231 @@
-import React, { Component, PureComponent } from 'react';
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import ReactDataSheet from 'react-datasheet';
-import Modal from 'react-modal';
-import clsx from 'clsx';
+import { CSVLink } from 'react-csv';
 
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-
 import Card from '@material-ui/core/Card';
+import CardContent from '@material-ui/core/CardContent';
 import ToolBar from '@material-ui/core/Toolbar';
 import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
-import TextField from '@material-ui/core/TextField';
-
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import SettingsIcon from '@material-ui/icons/Settings';
 import NavigationIcon from '@material-ui/icons/Navigation';
-
+import LockIcon from '@material-ui/icons/Lock';
+import OpenInNewIcon from '@material-ui/icons/OpenInNew';
 import Fab from '@material-ui/core/Fab';
 
 import '../css/indextable.css';
-
 import firebase, { auth } from '../firebase.js';
-import Switch from "@material-ui/core/Switch";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-
-
-
-Modal.setAppElement('#root');
+import { NEW_SITE_URL } from './DeprecationGuard';
 
 const styles = theme => ({
   root: {
     flexGrow: 1,
   },
-  buttonNew: {
-    width: '100%',
-    borderRadius: '4px',
-    minWidth: '88px',
-    backgroundColor: '#FA6900',
-    cursor: 'pointer',
-    border: '0',
-    minWidth: '120px',
-    color: '#fff',
-    fontSize: '14px',
-    boxShadow: '0 2px 5px 0 rgba(0,0,0,.26)',
-    padding: '10px 6px',
-    '&:hover': {
-      backgroundColor: '#d75c04'
-    },
-  },
-  buttonConfig: {
-    width: '100%',
-    borderRadius: '4px',
-    backgroundColor: '#FA6900',
-    cursor: 'pointer',
-    border: '0',
-    minWidth: '50px',
-    color: '#fff',
-    fontSize: '14px',
-    boxShadow: '0 2px 5px 0 rgba(0,0,0,.26)',
-    padding: '10px 6px',
-    '&:hover': {
-      backgroundColor: '#d75c04'
-    },
-    numBox: {
-      width: '500px'
-    }
+  heading: {
+    fontWeight: 700,
+    color: '#222',
   },
 });
 
-class CustomEditor extends PureComponent {
-    constructor (props) {
-        super(props)
-        this.handleChange = this.handleChange.bind(this)
-        this.handleKeyDown = this.handleKeyDown(this)
-    }
-
-    componentDidMount () {
-        this._input.focus()
-    }
-
-    handleChange (e) {
-        let cachedValue = e.target.value
-        this.props.onChange(cachedValue)
-    }
-
-    render () {
-        const {value, onKeyDown} = this.props
-        return (
-            <textarea
-                style={{maxWidth: '100%', minWidth: '100%', minHeight: '70px',padding:'0px', marginBottom:'0px', border:'0px', outline:'0px'}}
-                ref={input => { this._input = input }}
-                type='text'
-                className='data-editor'
-                value={value}
-
-                onChange={this.handleChange}
-                onKeyDownCapture={this.onKeyDown}
-            />
-        )
-    }
-
-    handleKeyDown (e) {
-        console.log("TEST")
-        if (e.which === 13 && !e.shiftKey) {
-            console.log("TEST")
-            e.persist()
-            this.setState({ e })
-        } else {
-            this.setState({ e: null })
-        }
-    }
-
-}
-
 class Indexer extends Component {
-  constructor (props) {
-     super(props)
-
-     this.state = {
-        newTitle: '',
-        newDescription: '',
-        newPage: '',
-        newBook: '',
-        indexImport: '',
-        showModal: false,
-         textarea: true,
-        user: null,
-        uid: null,
-        as: 'table',
-        columns: [
-         { label: 'Title', width: '30%' },
-         { label: 'Description', width: '20%' },
-         { label: 'Color (SRM)', width: '20%' },
-         { label: 'Rating', width: '20%' }
+  constructor(props) {
+    super(props);
+    this.state = {
+      user: null,
+      uid: null,
+      grid: [
+        [
+          { readOnly: true, width: 25, value: '' },
+          { value: 'Title', readOnly: true, width: 200 },
+          { value: 'Description', readOnly: true },
+          { value: 'Page', readOnly: true, width: 50 },
+          { value: 'Book', readOnly: true, width: 50 },
         ],
-        grid: [
-           [
-             {readOnly: true, width: 25, value: ''},
-             {value: 'Title', readOnly: true, width: 200},
-             {value: 'Description', readOnly: true},
-             {value: 'Page', readOnly: true, width: 50},
-             {value: 'Book', readOnly: true, width: 50}
-           ]
-         ]
-     }
-     this.handleChange = this.handleChange.bind(this);
-     this.handleSubmit = this.handleSubmit.bind(this);
-     this.showImportDialog = this.showImportDialog.bind(this);
-     this.handleImport = this.handleImport.bind(this);
-     this.scrollToBottom = this.scrollToBottom.bind(this);
-     this.scrollToTop = this.scrollToTop.bind(this);
-      this.handleChangeOptions = this.handleChangeOptions.bind(this);
-   }
-   componentDidMount() {
-      auth.onAuthStateChanged((user) => {
-       if (user) {
-          this.setState({ user });
-          this.setState({ uid: auth.getUid() });
-          const indexesRef = firebase.database().ref('/users/' + this.state.uid + '/indexdata/' + this.props.indexTitle.indexId);
-          indexesRef.on('value', (snapshot) => {
-            let items = snapshot.val();
-            let newState = [];
-            for (let item in items) {
+      ],
+    };
+    this.scrollToBottom = this.scrollToBottom.bind(this);
+    this.scrollToTop = this.scrollToTop.bind(this);
+  }
+
+  componentDidMount() {
+    this.unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user && this.props.indexTitle && this.props.indexTitle.indexId) {
+        const uid = user.uid;
+        this.setState({ user, uid });
+        this.indexesRef = firebase
+          .database()
+          .ref('/users/' + uid + '/indexdata/' + this.props.indexTitle.indexId);
+        this.indexesRef.on('value', (snapshot) => {
+          const items = snapshot.val();
+          const newState = [];
+          for (let item in items) {
+            if (items[item] && items[item].grid) {
               newState.push({
-                grid: items[item].grid
+                grid: items[item].grid,
               });
             }
-            if(newState[0])
-            {
-              this.setState({
-                grid: newState[0].grid
-              });
-            }
-          });
-       }
-     });
-   }
-   updateGrid(updatedGrid) {
-      const indexRef = firebase.database().ref('/users/' + this.state.uid + '/indexdata/' + this.props.indexTitle.indexId);
-      indexRef.remove();
-      const updateIndex = {
-        grid: updatedGrid.grid
+          }
+          if (newState[0] && Array.isArray(newState[0].grid)) {
+            const readOnlyGrid = newState[0].grid.map((row) =>
+              Array.isArray(row)
+                ? row.map((cell) => ({
+                    ...(cell || { value: '' }),
+                    readOnly: true,
+                  }))
+                : []
+            );
+            this.setState({ grid: readOnlyGrid });
+          }
+        });
       }
-      indexRef.push(updateIndex);
-   }
-   updateHistory(newRow) {
-     //New feature triggered by handleSubmit (currently doesn't affect direct grid modifications)
-     //This feature posts all index modifications to a parallel immutable history index that cannot be deleted
-    const indexRef = firebase.database().ref('/users/' + this.state.uid + '/history/' + this.props.indexTitle.indexId);
-    indexRef.push(newRow);
-   }
-   handleChange(e) {
-     this.setState({
-      [e.target.name]: e.target.value
-     });
-   }
-    handleChangeOptions(event) {
-        if (event.target.value) {
-            this.setState({"textarea": event.target.value})
-        }else{
-            this.setState({"textarea": !this.state.textarea})
-        }
-        console.log(this.state.textarea)
+    });
+  }
+
+  componentWillUnmount() {
+    if (this.unsubscribe) {
+      this.unsubscribe();
     }
-   handleSubmit(e) {
-      e.preventDefault();
-      var gridold = this.state.grid
-      var newRow = [{readOnly: true, value: gridold.length}, {value: this.state.newTitle}, {value: this.state.newDescription}, {value: this.state.newPage}, {value: this.state.newBook}]
-      gridold.push(newRow)
-      var tmpGrid = {grid: this.state.grid}
-      this.setState(this.state.grid)
-      this.setState({
-         newTitle: '',
-         newDescription: '',
-         newPage: '',
-         newBook: ''
-      })
-      this.updateHistory(newRow);
-      this.updateGrid(tmpGrid);
-   }
-   handleImport(e) {
-      e.preventDefault();
-      let lines = this.state.indexImport.split('\n');
-      var gridold = [];
+    if (this.indexesRef) {
+      this.indexesRef.off();
+    }
+  }
 
-      for (var i = 0;i<lines.length;i++) {
-         let elements = lines[i].split(',');
-         var newRow = [{readOnly: true, value: gridold.length}, {value: elements[0]}, {value: elements[1]}, {value: elements[2]}, {value: elements[3]}]
-         gridold.push(newRow);
-      }
+  scrollToTop() {
+    if (this.top) {
+      this.top.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
 
-      var tmpGrid = this.state.grid;
-      Array.prototype.push.apply(tmpGrid,gridold);
+  scrollToBottom() {
+    if (this.bottom) {
+      this.bottom.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
 
-      tmpGrid = {grid: this.state.grid}
-      this.setState(this.state.grid)
-
-      this.updateGrid(tmpGrid);
-      this.setState({ showModal: false });
-   }
-   showImportDialog(e) {
-      e.preventDefault();
-      this.setState({ showModal: true });
-   }
-   scrollToTop() {
-     this.top.scrollIntoView({behavior: "smooth"})
-   }
-   scrollToBottom() {
-     this.bottom.scrollIntoView({behavior: "smooth"})
-   }
+  buildCsvData() {
+    const rows = [];
+    for (let i = 1; i < this.state.grid.length; i++) {
+      const row = this.state.grid[i];
+      if (!row || row.length < 5) continue;
+      rows.push({
+        Title: row[1] && row[1].value != null ? String(row[1].value) : '',
+        Description: row[2] && row[2].value != null ? String(row[2].value) : '',
+        Page: row[3] && row[3].value != null ? String(row[3].value) : '',
+        Book: row[4] && row[4].value != null ? String(row[4].value) : '',
+      });
+    }
+    return rows;
+  }
 
   render() {
-    const { classes } = this.props;
+    const { classes, indexTitle } = this.props;
+    const indexName = indexTitle && indexTitle.indexName ? indexTitle.indexName : 'Legacy Index';
+    const safeFilename = (indexName || 'voltaire-index').replace(/[^a-zA-Z0-9_-]+/g, '_') + '.csv';
+    const csvData = this.buildCsvData();
+
+    if (!indexTitle || !indexTitle.indexId) {
+      return (
+        <Container style={{ marginTop: '32px' }}>
+          <Card className="red-border" style={{ padding: '24px', textAlign: 'center' }}>
+            <Typography variant="h6" gutterBottom>
+              No index selected.
+            </Typography>
+            <Link to="/Indexes" style={{ textDecoration: 'none' }}>
+              <Button variant="contained" color="secondary">
+                Return to Legacy Indexes
+              </Button>
+            </Link>
+          </Card>
+        </Container>
+      );
+    }
+
     return (
       <div className="tablebg">
-      <p ref={(el) => {this.top = el;}}>&nbsp;</p>
-      <Fab className="scrollUp" onClick={this.scrollToTop}>
-        <NavigationIcon />
-      </Fab>
+        <p ref={(el) => { this.top = el; }}>&nbsp;</p>
+        <Fab className="scrollUp" onClick={this.scrollToTop}>
+          <NavigationIcon />
+        </Fab>
+        <Fab className="scrollDown" onClick={this.scrollToBottom}>
+          <NavigationIcon />
+        </Fab>
 
-      <Fab className="scrollDown" onClick={this.scrollToBottom}>
-        <NavigationIcon />
-      </Fab>
         <Container>
-        <Card className="red-border" style={{marginTop:"95px",zIndex:"0"}}>
-          <ToolBar>
-            <Typography className={classes.heading} variant={'h6'} gutterBottom>
-              <h3>{this.props.indexTitle.indexName}</h3>
-            </Typography>
-
-              <FormControlLabel style={{marginLeft:"auto"}}
-                  control={<Switch color="primary" checked={this.state.textarea} onChange={this.handleChangeOptions} name="textarea"/>}
-                  label="Multiline Editor"
-                  labelPlacement="end"
-
-              />
-
-
-          </ToolBar>
-          <form onSubmit={this.handleSubmit}>
-            <Container>
-            <Grid container direction="row" justify="space-around" alignItems="center" spacing={2}>
-              <Grid item xs={6} s={8} md={8} lg={10} xl={10}>
-                <TextField name="newTitle" onChange={this.handleChange} value={this.state.newTitle} variant="outlined" label="Row Title" style={{"width":"100%"}}/>
-              </Grid>
-              <Grid item xs={3} s={2} md={2} lg={1} xl={1}>
-                <TextField name="newPage" onChange={this.handleChange} value={this.state.newPage} variant="outlined" label="Page" style={{"width":"100%"}}/>
-              </Grid>
-              <Grid item xs={3} s={2} md={2} lg={1} xl={1}>
-                <TextField name="newBook" onChange={this.handleChange} value={this.state.newBook} variant="outlined" label="Book" style={{"width":"100%"}}/>
-              </Grid>
-              <br />
-              <Grid item xs={8} s={9} md={10} lg={10} xl={10}>
-                <TextField name="newDescription" onChange={this.handleChange} value={this.state.newDescription} variant="outlined" label="Description" style={{"width":"100%"}}/>
-              </Grid>
-              <Grid item xs={4} s={3} md={2} lg={2} xl={2}>
-                <Button onClick={this.handleSubmit} variant="contained" color="primary" style={{"width":"100%", "height":"1.1875em", "padding": "27px"}}>Add Row</Button>
-              </Grid>
-            </Grid>
-            </Container>
-          </form>
-          <br />
-        </Card>
+          <Card className="red-border" style={{ marginTop: '16px', zIndex: 0 }}>
+            <ToolBar style={{ flexWrap: 'wrap', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <LockIcon style={{ color: '#B11116' }} />
+                <Typography className={classes.heading} variant="h6">
+                  {indexName} (Read-Only)
+                </Typography>
+              </div>
+              <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <Link to="/Indexes" style={{ textDecoration: 'none' }}>
+                  <Button variant="outlined" style={{ textTransform: 'none' }}>
+                    Back to Indexes
+                  </Button>
+                </Link>
+                <CSVLink
+                  data={csvData}
+                  filename={safeFilename}
+                  style={{ textDecoration: 'none' }}
+                >
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    style={{ textTransform: 'none', fontWeight: 700 }}
+                  >
+                    Download CSV ({csvData.length} rows)
+                  </Button>
+                </CSVLink>
+                <Link to="/BuildIndex" style={{ textDecoration: 'none' }}>
+                  <Button variant="contained" color="primary" style={{ textTransform: 'none' }}>
+                    Export DOCX / Build
+                  </Button>
+                </Link>
+                <Button
+                  variant="outlined"
+                  href={NEW_SITE_URL}
+                  endIcon={<OpenInNewIcon />}
+                  style={{ textTransform: 'none' }}
+                >
+                  training.opensecurity.com
+                </Button>
+              </div>
+            </ToolBar>
+            <CardContent style={{ paddingTop: 0 }}>
+              <Typography variant="body2" style={{ color: '#7f0000', fontWeight: 600 }}>
+                Read-only recovery mode: adding, editing, and deleting rows are permanently disabled.
+                Export your index as CSV or DOCX above and continue on training.opensecurity.com.
+              </Typography>
+            </CardContent>
+          </Card>
         </Container>
+
         <center>
-        <Container>
-        <Card className="red-border" style={{marginTop:"35px",zIndex:"0", backgroundColor:"white"}}>
-            {
-            (this.state.textarea === true) ?
-                // Multi-line text editor
-                 <ReactDataSheet style={{width:"100%",margin:"auto",padding:"0px"}}
-                    data={this.state.grid}
-                    valueRenderer={(cell) => cell.value.toString().replaceAll("Voltaire{LineBreak} ", "\n")}
-                    onCellsChanged={changes => {
-                      const grid = this.state.grid.map(row => [...row])
-                      changes.forEach(({cell, row, col, value}) => {
-                        grid[row][col] = {...grid[row][col], value}
-                      })
-                      this.setState({grid})
-                      this.updateGrid({grid})
-                    }}
-
-                                 dataEditor={CustomEditor}/>
-
-            :
-                // Text Input Data Entry...
-
-                <ReactDataSheet style={{width:"100%",margin:"auto",padding:"0px"}}
-                                data={this.state.grid}
-                                valueRenderer={(cell) => cell.value.toString().replaceAll("\n", "Voltaire{LineBreak} ")}
-                                onCellsChanged={changes => {
-                                    const grid = this.state.grid.map(row => [...row])
-                                    changes.forEach(({cell, row, col, value}) => {
-                                        grid[row][col] = {...grid[row][col], value}
-                                    })
-                                    this.setState({grid})
-                                    this.updateGrid({grid})
-                                }}/>
-
-            }
-
-
-        </Card>
-        </Container>
+          <Container>
+            <Card
+              className="red-border"
+              style={{ marginTop: '24px', marginBottom: '48px', zIndex: 0, backgroundColor: 'white' }}
+            >
+              <ReactDataSheet
+                style={{ width: '100%', margin: 'auto', padding: '0px' }}
+                data={this.state.grid}
+                valueRenderer={(cell) =>
+                  cell && cell.value != null
+                    ? cell.value.toString().replace(/Voltaire\{LineBreak\} /g, '\n')
+                    : ''
+                }
+              />
+            </Card>
+          </Container>
         </center>
-        <p ref={(el) => {this.bottom = el;}}>&nbsp;</p>
+        <p ref={(el) => { this.bottom = el; }}>&nbsp;</p>
       </div>
-
-
-
     );
   }
 }
+
 export default withStyles(styles)(Indexer);

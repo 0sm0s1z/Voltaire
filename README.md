@@ -1,7 +1,12 @@
-# Voltaire
+# Voltaire (Deprecated)
+
+> **DEPRECATED:** Legacy Voltaire has been retired and replaced by **[https://training.opensecurity.com](https://training.opensecurity.com)**.  
+> New user accounts and all write/edit operations on the legacy Firebase deployment (`public-key-da9b4.firebaseapp.com`) are permanently disabled, and index data older than 1 year has been purged. Existing users with recent data may sign in strictly in read-only mode to export their indexes.
+
 Voltaire is a web-based indexing tool for GIAC certification examinations. Creating an index with Voltaire is a three phase process involving: documentation/note-taking, sorting & normalization, and word processing. This readme is meant to guide a user through this process. Alternatively, a YouTube walkthrough is avaliable at the link below.
 
-**Application URL:** https://voltaire.publickey.io 
+**New Platform URL:** https://training.opensecurity.com  
+**Legacy URL (redirects to new platform):** https://voltaire.publickey.io 
 
 Video: https://youtu.be/bHpkTArlXWc
 

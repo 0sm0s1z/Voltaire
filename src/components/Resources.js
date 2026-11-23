@@ -146,8 +146,8 @@ class Resources extends Component {
                       <Typography className={classes.heading} variant={'h6'} gutterBottom>
                         Get Certified!
                       </Typography>
-                      <Link className="navlogo" to="/Indexes">
-                        <Button className={classes.certButton}>Start Indexing</Button>
+                      <Link className="navlogo" href="https://training.opensecurity.com">
+                        <Button className={classes.certButton}>Go to training.opensecurity.com</Button>
                       </Link>
                     </CardContent>
                   </Card>
